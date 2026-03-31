@@ -1,6 +1,6 @@
 ## Geminated
 
-## BSCS 2-2 Group 5
+## Team
 
 <div align="center">
   <table border="0" cellpadding="14" cellspacing="0" style="border-collapse: collapse;">
