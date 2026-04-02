@@ -1,0 +1,154 @@
+.pageContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 6rem 0;
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Replaced harsh glow with a sophisticated DOST-style linear gradient wash */
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(63, 68, 140, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
+  z-index: -1;
+  border-radius: var(--radius-lg);
+}
+
+.heroContent {
+  max-width: 850px;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--foreground);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.highlight {
+  color: var(--primary-blue);
+  /* Optional subtle text shadow to lift it without neon glow */
+  text-shadow: 0 2px 10px rgba(15, 43, 92, 0.1);
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  margin-bottom: 3rem;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.ctaGroup {
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;
+}
+
+.featureSection {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  color: var(--primary-blue);
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+}
+
+.featureGrid h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--institutional-blue);
+  margin-bottom: 1rem;
+}
+
+.featureGrid p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Liquid glassmorphism callout replacing the flat neon-ish block */
+.statsCallout {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 4rem 3rem;
+  border-radius: var(--radius-lg);
+  margin-top: 2rem;
+  
+  /* Liquid Glass Style applied here */
+  background: linear-gradient(145deg, rgba(63, 68, 140, 0.75), rgba(29, 79, 145, 0.34));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: white;
+  box-shadow: 0 24px 52px rgba(15, 43, 92, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  position: relative;
+  overflow: hidden;
+}
+
+.statsCallout::before {
+  content: "";
+  position: absolute;
+  top: -50%; right: -20%;
+  width: 100%; height: 150%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.statsCallout h4 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #f2f6ff;
+  margin-bottom: 0.5rem;
+}
+
+.statCard {
+  text-align: center;
+  z-index: 1;
+}
+
+.statCard p {
+  font-weight: 500;
+  opacity: 0.85;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .title { font-size: 2.75rem; }
+  .statsCallout {
+    flex-direction: column;
+    gap: 3rem;
+    padding: 3rem 2rem;
+  }
+}

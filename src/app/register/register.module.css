@@ -1,0 +1,106 @@
+.container {
+  min-height: calc(100vh - 12rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+}
+
+.authCard {
+  width: 100%;
+  max-width: 550px;
+  padding: 3rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.header h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.inputGroup input, .inputGroup select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.inputGroup input:focus, .inputGroup select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(29, 79, 145, 0.14);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.submitBtn {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1.1rem;
+}
+
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.footer a {
+  color: var(--institutional-blue);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.errorMessage {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+@media (max-width: 600px) {
+  .row { grid-template-columns: 1fr; gap: 1.5rem; }
+  .authCard { padding: 2rem; }
+}

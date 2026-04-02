@@ -1,0 +1,104 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  /* border-bottom managed by .glass in globals.css */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 4.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logoText {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.02em;
+}
+.tagline {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-left: 1px solid var(--border);
+  padding-left: 0.75rem;
+}
+
+.nav {
+  display: flex;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+.navLink {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color 0.3s ease;
+  position: relative;
+}
+.navLink:hover {
+  color: var(--primary-blue);
+}
+
+.externalLink {
+  color: var(--secondary-accent);
+  font-weight: 600;
+}
+.externalLink:hover {
+  color: var(--secondary-accent-hover);
+}
+
+.authActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.mainContent {
+  flex: 1 0 auto;
+  padding: 3rem 0 1.5rem;
+}
+
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+@media (max-width: 968px) {
+  .nav {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoText {
+    font-size: 1.15rem;
+  }
+  .tagline {
+    display: none;
+  }
+  .container {
+    padding: 0 1rem;
+  }
+}
