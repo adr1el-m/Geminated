@@ -4,26 +4,35 @@
   padding: 0 2rem;
 }
 
+.header {
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 480px) {
+  .pageContainer {
+    padding: 0 1rem;
+  }
+}
+
 .title {
   font-size: 2.25rem;
   font-weight: 800;
-  color: var(--primary-blue);
+  color: var(--foreground);
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
   font-size: 1.125rem;
-  color: var(--text-muted);
+  color: var(--foreground);
+  opacity: 0.82;
   max-width: 800px;
-  margin-bottom: 2rem;
 }
 
 .contentGrid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
-  height: calc(100vh - 16rem);
-  min-height: 600px;
+  min-height: clamp(520px, 68dvh, 760px);
 }
 
 .mapContainer {
@@ -73,47 +82,45 @@
 }
 
 .insightList li {
-  padding: 1.25rem;
+  padding: 1rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  background: white;
+  background: var(--surface);
   box-shadow: var(--shadow-sm);
   font-size: 0.95rem;
 }
-
-[data-theme="dark"] .insightList li {
-  background: var(--surface);
-  border-color: rgba(255, 255, 255, 0.05);
-}
 .insightList strong {
   display: block;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
   font-size: 1rem;
+  color: var(--foreground);
 }
 .insightList p {
-  color: var(--text-muted);
+  color: var(--foreground);
+  opacity: 0.78;
   margin: 0;
-  line-height: 1.5;
 }
 
-[data-theme="dark"] .insightList p {
-  color: #94a3b8;
+.critical {
+  border-left: 4px solid #d64545;
 }
 
-[data-theme="dark"] .insightList strong {
-  color: #f8fafc;
+.warning {
+  border-left: 4px solid #b8791b;
 }
 
-.critical,
-.warning,
 .stable {
-  border-color: var(--border);
+  border-left: 4px solid #2f855a;
 }
 
 @media (max-width: 900px) {
   .contentGrid {
     grid-template-columns: 1fr;
     height: auto;
+    min-height: 0;
+    gap: 1.5rem;
   }
-  .mapContainer { height: 500px; }
+  .mapContainer { height: 400px; }
+  .title { font-size: 1.75rem; }
+  .subtitle { font-size: 1rem; margin-bottom: 1.5rem; }
 }

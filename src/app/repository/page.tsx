@@ -4,6 +4,10 @@ import repoStyles from './repository.module.css';
 import { getResources } from '@/lib/community';
 import { PHILIPPINE_REGIONS_SHORT } from '@/lib/constants';
 
+type PageProps = {
+  searchParams: Promise<{ uploaded?: string }>;
+};
+
 function getAvatarByName(name: string) {
   const normalized = name.toLowerCase();
 
@@ -16,7 +20,8 @@ function getAvatarByName(name: string) {
   return null;
 }
 
-export default async function RepositoryPage() {
+export default async function RepositoryPage({ searchParams }: PageProps) {
+  const { uploaded } = await searchParams;
   const resources = await getResources();
 
   return (
@@ -59,6 +64,15 @@ export default async function RepositoryPage() {
         />
       </div>
 
+      {uploaded === '1' ? (
+        <div className="card" style={{ marginBottom: '1.5rem', borderColor: 'rgba(34, 139, 58, 0.3)' }}>
+          <h3 style={{ marginBottom: '0.25rem' }}>Document submitted for approval</h3>
+          <p style={{ color: 'var(--text-muted)' }}>
+            Your upload is now pending admin review and will appear in the repository after approval.
+          </p>
+        </div>
+      ) : null}
+
       <div className={repoStyles.grid}>
         {resources.length === 0 ? (
           <div className="card">
@@ -89,7 +103,9 @@ export default async function RepositoryPage() {
                     ) : null}
                   </div>
                   <div className={repoStyles.authorDetails}>
-                    <strong>{project.author_name}</strong>
+                    <Link href={`/profile/${project.author_id}`} className={repoStyles.authorProfileLink}>
+                      <strong>{project.author_name}</strong>
+                    </Link>
                     <span>{project.file_name}</span>
                   </div>
                 </div>

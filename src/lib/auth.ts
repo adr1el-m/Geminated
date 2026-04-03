@@ -17,6 +17,17 @@ export type Profile = {
   created_at: string;
 };
 
+export type PublicProfile = {
+  id: string;
+  full_name: string;
+  region: string;
+  school: string;
+  subjects_taught: string[];
+  years_of_experience: number;
+  role: UserRole;
+  created_at: string;
+};
+
 const SESSION_COOKIE = 'starlink_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30;
 
@@ -234,4 +245,23 @@ export async function updateCurrentUserProfile(input: {
   }
 
   return updated;
+}
+
+export async function getPublicProfileById(id: string): Promise<PublicProfile | null> {
+  const rows = (await db`
+    select
+      id,
+      full_name,
+      region,
+      school,
+      subjects_taught,
+      years_of_experience,
+      role,
+      created_at
+    from profiles
+    where id = ${id}
+    limit 1
+  `) as PublicProfile[];
+
+  return rows[0] ?? null;
 }

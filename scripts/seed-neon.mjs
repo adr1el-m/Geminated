@@ -73,9 +73,9 @@ async function insertForumPostIfMissing(post) {
 
   if (existing.rowCount === 0) {
     await pool.query(
-      `insert into forum_posts (id, title, content, region, category, author_id)
-       values ($1, $2, $3, $4, $5, $6)`,
-      [crypto.randomUUID(), post.title, post.content, post.region, post.category, post.authorId]
+      `insert into forum_posts (id, title, content, region, category, moderation_status, author_id)
+       values ($1, $2, $3, $4, $5, $6, $7)`,
+      [crypto.randomUUID(), post.title, post.content, post.region, post.category, 'approved', post.authorId]
     );
   }
 }
@@ -85,8 +85,8 @@ async function insertResourceIfMissing(resource) {
 
   if (existing.rowCount === 0) {
     await pool.query(
-      `insert into resources (id, title, description, file_name, mime_type, file_size, file_data, author_id)
-       values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      `insert into resources (id, title, description, file_name, mime_type, file_size, file_data, moderation_status, author_id)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         crypto.randomUUID(),
         resource.title,
@@ -95,6 +95,7 @@ async function insertResourceIfMissing(resource) {
         'text/plain',
         Buffer.byteLength(resource.fileData),
         Buffer.from(resource.fileData),
+        'approved',
         resource.authorId,
       ]
     );

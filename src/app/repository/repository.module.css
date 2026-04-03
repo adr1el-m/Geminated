@@ -140,6 +140,15 @@
   color: var(--foreground);
 }
 
+.authorProfileLink {
+  color: var(--foreground);
+}
+
+.authorProfileLink:hover {
+  color: var(--primary-blue);
+  text-decoration: underline;
+}
+
 .authorDetails span {
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -155,55 +164,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-}
-
-.labelSmall {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 0.25rem;
-}
-
-.dropZone {
-  border: 2px dashed var(--border);
-  border-radius: var(--radius-md);
-  padding: 2rem;
-  text-align: center;
-  background: rgba(63, 68, 140, 0.02);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-[data-theme="dark"] .dropZone {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.dropZone:hover, .dropZoneActive {
-  border-color: var(--primary-blue);
-  background: rgba(29, 79, 145, 0.05);
-  transform: translateY(-2px);
-}
-
-.dropZoneContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  color: var(--text-muted);
-}
-
-.dropZoneContent svg {
-  color: var(--primary-blue);
-  opacity: 0.8;
-}
-
-.dropZoneContent p {
-  font-size: 0.9rem;
-  font-weight: 500;
 }
 
 .formRow label {
@@ -223,6 +183,28 @@
   padding: 0.75rem 0.9rem;
   font: inherit;
   outline: none;
+}
+
+.formRow input[type="file"] {
+  width: 100%;
+  overflow: hidden;
+  padding: 0.4rem;
+}
+
+.formRow input[type="file"]::file-selector-button {
+  border: 1px solid rgba(111, 143, 192, 0.35);
+  background: var(--secondary-accent);
+  color: var(--primary-blue);
+  border-radius: 0.55rem;
+  padding: 0.5rem 0.9rem;
+  margin-right: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.formRow input[type="file"]::file-selector-button:hover {
+  background: var(--secondary-accent-hover);
 }
 
 .formRow input:focus,

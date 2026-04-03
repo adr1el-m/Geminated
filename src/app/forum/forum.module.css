@@ -110,20 +110,13 @@
 }
 
 .category {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  color: white;
+  color: var(--institutional-blue);
   text-transform: uppercase;
-  background: var(--primary-blue);
-  padding: 0.25rem 0.6rem;
-  border-radius: 4px;
-  letter-spacing: 0.05em;
-}
-
-[data-theme="dark"] .category {
-  background: rgba(111, 143, 192, 0.2);
-  color: #e2e8f0;
-  border: 1px solid rgba(111, 143, 192, 0.3);
+  background: rgba(63, 68, 140, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
 }
 
 .regionBadge {
@@ -163,6 +156,14 @@
   color: var(--text-muted);
 }
 
+.authorProfileLink {
+  color: var(--primary-blue);
+}
+
+.authorProfileLink:hover {
+  text-decoration: underline;
+}
+
 .avatarMini {
   position: relative;
   width: 24px;
@@ -195,17 +196,15 @@
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-  align-items: end; /* Align bottoms of inputs/labels */
+  gap: 0.75rem;
 }
 
 .formRow label,
 .formBody {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   font-size: 0.85rem;
-  font-weight: 600;
   color: var(--text-muted);
 }
 
@@ -217,19 +216,8 @@
   background: var(--background);
   color: var(--foreground);
   padding: 0.75rem 0.9rem;
-  font-family: inherit;
-  font-size: 0.95rem;
+  font: inherit;
   outline: none;
-  width: 100%;
-  transition: all 0.2s ease;
-}
-
-.formRow select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  padding-right: 2.5rem;
 }
 
 .formRow input:focus,

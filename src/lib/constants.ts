@@ -37,3 +37,12 @@ export const PHILIPPINE_REGIONS_SHORT = [
   "CAR",
   "BARMM"
 ];
+
+export const MOCK_SEED_EMAILS = [
+  'adriel@example.org',
+  'janel@example.org',
+  'gem@example.org',
+  'marti@example.org',
+  'christine@example.org',
+  'admin@starlink.local',
+];

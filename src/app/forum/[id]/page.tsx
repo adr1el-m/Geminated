@@ -60,7 +60,10 @@ export default async function ForumTopicPage({ params }: PageProps) {
               ) : null}
             </div>
             <span>
-              Posted by <strong>{topic.author_name}</strong>
+              Posted by{' '}
+              <Link href={`/profile/${topic.author_id}`} className={forumStyles.authorProfileLink}>
+                <strong>{topic.author_name}</strong>
+              </Link>
             </span>
           </div>
           <div className={forumStyles.stats}>

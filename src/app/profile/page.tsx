@@ -43,11 +43,18 @@ export default async function ProfilePage() {
           <h1>{profile.full_name}</h1>
           <p className={profileStyles.roleBadge}>{profile.role.toUpperCase()}</p>
         </div>
-        <form action={signOutAction}>
-          <button type="submit" className="btn btn-secondary">
-            Sign Out
-          </button>
-        </form>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          {profile.role === 'admin' ? (
+            <Link href="/admin" className="btn btn-primary">
+              Admin Dashboard
+            </Link>
+          ) : null}
+          <form action={signOutAction}>
+            <button type="submit" className="btn btn-secondary">
+              Sign Out
+            </button>
+          </form>
+        </div>
       </header>
 
       <div className={profileStyles.contentGrid}>

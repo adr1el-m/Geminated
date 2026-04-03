@@ -30,11 +30,15 @@ create table if not exists forum_posts (
   content text not null,
   region text not null,
   category text not null,
+  moderation_status text not null default 'pending' check (moderation_status in ('pending', 'approved', 'rejected')),
+  moderated_by uuid references profiles(id) on delete set null,
+  moderated_at timestamptz,
   author_id uuid not null references profiles(id) on delete cascade,
   created_at timestamptz not null default timezone('utc'::text, now())
 );
 
 create index if not exists forum_posts_created_at_idx on forum_posts(created_at desc);
+create index if not exists forum_posts_moderation_status_idx on forum_posts(moderation_status);
 
 create table if not exists resources (
   id uuid primary key default gen_random_uuid(),
@@ -44,8 +48,20 @@ create table if not exists resources (
   mime_type text not null,
   file_size integer not null,
   file_data bytea not null,
+  moderation_status text not null default 'pending' check (moderation_status in ('pending', 'approved', 'rejected')),
+  moderated_by uuid references profiles(id) on delete set null,
+  moderated_at timestamptz,
   author_id uuid not null references profiles(id) on delete cascade,
   created_at timestamptz not null default timezone('utc'::text, now())
 );
 
 create index if not exists resources_created_at_idx on resources(created_at desc);
+create index if not exists resources_moderation_status_idx on resources(moderation_status);
+
+alter table forum_posts add column if not exists moderation_status text not null default 'pending';
+alter table forum_posts add column if not exists moderated_by uuid references profiles(id) on delete set null;
+alter table forum_posts add column if not exists moderated_at timestamptz;
+
+alter table resources add column if not exists moderation_status text not null default 'pending';
+alter table resources add column if not exists moderated_by uuid references profiles(id) on delete set null;
+alter table resources add column if not exists moderated_at timestamptz;

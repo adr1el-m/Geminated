@@ -2,7 +2,12 @@
 
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
-import { createForumTopic, createResourceUpload } from '@/lib/community';
+import {
+  createForumTopic,
+  createResourceUpload,
+  updateForumTopicModeration,
+  updateResourceModeration,
+} from '@/lib/community';
 
 export type CommunityActionState = {
   error: string | null;
@@ -40,7 +45,7 @@ export async function createTopicAction(_state: CommunityActionState, formData: 
     return { error: toMessage(error) } satisfies CommunityActionState;
   }
 
-  redirect('/forum');
+  redirect('/forum?submitted=1');
 }
 
 export async function uploadDocumentAction(_state: CommunityActionState, formData: FormData) {
@@ -74,5 +79,69 @@ export async function uploadDocumentAction(_state: CommunityActionState, formDat
     return { error: toMessage(error) } satisfies CommunityActionState;
   }
 
-  redirect('/repository');
+  redirect('/repository?uploaded=1');
+}
+
+async function requireAdminUser() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  if (user.role !== 'admin') {
+    throw new Error('Only admins can perform moderation actions.');
+  }
+
+  return user;
+}
+
+async function moderateResourceByStatus(formData: FormData, status: 'approved' | 'rejected') {
+  const admin = await requireAdminUser();
+  const resourceId = String(formData.get('resourceId') ?? '').trim();
+
+  if (!resourceId) {
+    throw new Error('Missing resource ID.');
+  }
+
+  await updateResourceModeration({
+    id: resourceId,
+    status,
+    moderatedBy: admin.id,
+  });
+
+  redirect('/admin?moderated=1');
+}
+
+async function moderateForumTopicByStatus(formData: FormData, status: 'approved' | 'rejected') {
+  const admin = await requireAdminUser();
+  const topicId = String(formData.get('topicId') ?? '').trim();
+
+  if (!topicId) {
+    throw new Error('Missing topic ID.');
+  }
+
+  await updateForumTopicModeration({
+    id: topicId,
+    status,
+    moderatedBy: admin.id,
+  });
+
+  redirect('/admin?moderated=1');
+}
+
+export async function approveResourceAction(formData: FormData) {
+  await moderateResourceByStatus(formData, 'approved');
+}
+
+export async function rejectResourceAction(formData: FormData) {
+  await moderateResourceByStatus(formData, 'rejected');
+}
+
+export async function approveTopicAction(formData: FormData) {
+  await moderateForumTopicByStatus(formData, 'approved');
+}
+
+export async function rejectTopicAction(formData: FormData) {
+  await moderateForumTopicByStatus(formData, 'rejected');
 }

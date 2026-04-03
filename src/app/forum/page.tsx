@@ -4,6 +4,10 @@ import Image from 'next/image';
 import { getForumTopics } from '@/lib/community';
 import { PHILIPPINE_REGIONS_SHORT } from '@/lib/constants';
 
+type PageProps = {
+  searchParams: Promise<{ submitted?: string }>;
+};
+
 function getAvatarByName(name: string) {
   const normalized = name.toLowerCase();
 
@@ -42,7 +46,8 @@ function ClockIcon() {
   );
 }
 
-export default async function ForumPage() {
+export default async function ForumPage({ searchParams }: PageProps) {
+  const { submitted } = await searchParams;
   const topics = await getForumTopics();
 
   return (
@@ -73,6 +78,15 @@ export default async function ForumPage() {
         </aside>
 
         <main className={forumStyles.feed}>
+          {submitted === '1' ? (
+            <div className="card" style={{ borderColor: 'rgba(34, 139, 58, 0.3)' }}>
+              <h3 style={{ marginBottom: '0.25rem' }}>Topic submitted for approval</h3>
+              <p style={{ color: 'var(--text-muted)' }}>
+                Thanks for contributing. Your topic will appear publicly once an admin approves it.
+              </p>
+            </div>
+          ) : null}
+
           {topics.length === 0 ? (
             <div className="card">
               <h3>No topics yet</h3>
@@ -109,7 +123,10 @@ export default async function ForumPage() {
                       ) : null}
                     </div>
                     <span>
-                      Posted by <strong>{topic.author_name}</strong>
+                      Posted by{' '}
+                      <Link href={`/profile/${topic.author_id}`} className={forumStyles.authorProfileLink}>
+                        <strong>{topic.author_name}</strong>
+                      </Link>
                     </span>
                   </div>
                   <div className={forumStyles.stats}>

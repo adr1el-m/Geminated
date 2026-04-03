@@ -9,7 +9,7 @@ export default function NewTopicPage() {
         <div className={forumStyles.titleBlock}>
           <h1 className={forumStyles.title}>Start a New Topic</h1>
           <p className={forumStyles.subtitle}>
-            Ask questions, share challenges, and spark discussions with educators across your region and beyond.
+            Ask questions, share challenges, and spark discussions with educators across your region and beyond. New topics are reviewed by an admin before publication.
           </p>
         </div>
         <Link href="/forum" className="btn btn-primary" style={{ height: 'fit-content' }}>

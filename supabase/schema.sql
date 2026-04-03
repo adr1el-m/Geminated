@@ -27,6 +27,9 @@ CREATE TABLE public.resources (
   abstract TEXT,
   file_url TEXT,
   tags TEXT[] DEFAULT '{}'::TEXT[],
+  moderation_status TEXT NOT NULL DEFAULT 'pending' CHECK (moderation_status IN ('pending', 'approved', 'rejected')),
+  moderated_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  moderated_at TIMESTAMP WITH TIME ZONE,
   author_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::TEXT, NOW()) NOT NULL
 );
@@ -43,6 +46,9 @@ CREATE TABLE public.forum_posts (
   content TEXT NOT NULL,
   region TEXT NOT NULL,
   category TEXT NOT NULL,
+  moderation_status TEXT NOT NULL DEFAULT 'pending' CHECK (moderation_status IN ('pending', 'approved', 'rejected')),
+  moderated_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  moderated_at TIMESTAMP WITH TIME ZONE,
   author_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::TEXT, NOW()) NOT NULL
 );
