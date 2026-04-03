@@ -8,6 +8,18 @@ import {
   updateForumTopicModeration,
   updateResourceModeration,
 } from '@/lib/community';
+import { getRequestFingerprint } from '@/lib/request-meta';
+import { checkRateLimit } from '@/lib/rate-limit';
+
+const MAX_TOPIC_TITLE = 160;
+const MAX_TOPIC_CONTENT = 6000;
+const MAX_UPLOAD_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+
+const ALLOWED_UPLOAD_MIME_TYPES = new Set([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]);
 
 export type CommunityActionState = {
   error: string | null;
@@ -29,8 +41,27 @@ export async function createTopicAction(_state: CommunityActionState, formData: 
   const region = String(formData.get('region') ?? '').trim();
   const category = String(formData.get('category') ?? '').trim();
 
+  const fingerprint = await getRequestFingerprint(`topic:${user.id}`);
+  const attempt = checkRateLimit({
+    key: fingerprint,
+    windowMs: 10 * 60 * 1000,
+    maxRequests: 8,
+  });
+
+  if (!attempt.allowed) {
+    return {
+      error: `Too many topic submissions. Try again in ${attempt.retryAfterSeconds}s.`,
+    } satisfies CommunityActionState;
+  }
+
   if (!title || !content || !region || !category) {
     return { error: 'All topic fields are required.' } satisfies CommunityActionState;
+  }
+
+  if (title.length > MAX_TOPIC_TITLE || content.length > MAX_TOPIC_CONTENT) {
+    return {
+      error: 'Topic title or content exceeds allowed length.',
+    } satisfies CommunityActionState;
   }
 
   try {
@@ -59,8 +90,38 @@ export async function uploadDocumentAction(_state: CommunityActionState, formDat
   const description = String(formData.get('description') ?? '').trim() || null;
   const document = formData.get('document');
 
+  const fingerprint = await getRequestFingerprint(`upload:${user.id}`);
+  const attempt = checkRateLimit({
+    key: fingerprint,
+    windowMs: 10 * 60 * 1000,
+    maxRequests: 6,
+  });
+
+  if (!attempt.allowed) {
+    return {
+      error: `Too many uploads. Try again in ${attempt.retryAfterSeconds}s.`,
+    } satisfies CommunityActionState;
+  }
+
   if (!title || !(document instanceof File) || document.size === 0) {
     return { error: 'Title and document file are required.' } satisfies CommunityActionState;
+  }
+
+  if (title.length > 160 || (description && description.length > 1500)) {
+    return { error: 'Title or description exceeds allowed length.' } satisfies CommunityActionState;
+  }
+
+  if (document.size > MAX_UPLOAD_FILE_SIZE_BYTES) {
+    return { error: 'Document exceeds the 10MB upload limit.' } satisfies CommunityActionState;
+  }
+
+  const mimeType = document.type || 'application/octet-stream';
+  const hasAllowedExtension = /\.(pdf|doc|docx)$/i.test(document.name);
+
+  if (!ALLOWED_UPLOAD_MIME_TYPES.has(mimeType) || !hasAllowedExtension) {
+    return {
+      error: 'Only PDF, DOC, and DOCX files are allowed.',
+    } satisfies CommunityActionState;
   }
 
   const fileData = Buffer.from(await document.arrayBuffer());
@@ -70,7 +131,7 @@ export async function uploadDocumentAction(_state: CommunityActionState, formDat
       title,
       description,
       fileName: document.name,
-      mimeType: document.type || 'application/octet-stream',
+      mimeType,
       fileSize: document.size,
       fileData,
       authorId: user.id,

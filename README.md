@@ -177,6 +177,48 @@ Even though the current e-STAR.ph portal is not publicly accessible, STAR-LINK w
 - Admin analytics dashboard
 - Report export workflows
 
+## 7. Production and Commercial Readiness
+
+### 7.1 Security Hardening Included
+
+- App-wide security headers via Next.js config:
+  - `X-Frame-Options: DENY`
+  - `X-Content-Type-Options: nosniff`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+  - `Permissions-Policy` locks camera/mic/geolocation
+  - `Cross-Origin-Opener-Policy`, `Cross-Origin-Resource-Policy`
+  - `Strict-Transport-Security` in production
+- Auth and community server actions protected with rate limiting
+- Document download endpoint hardened with:
+  - UUID validation
+  - download rate limiting
+  - filename sanitization
+  - private/no-store caching
+
+### 7.2 Environment and Configuration
+
+- Use `.env.example` as the baseline for required deployment variables.
+- `DATABASE_URL` is required.
+- Supabase public env vars are required in production.
+
+### 7.3 Operational Health and Deploy Checks
+
+- Health probe endpoint: `GET /api/health`
+- CI-safe scripts:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run build`
+  - `npm run ci` (runs all checks above)
+
+### 7.4 Go-Live Checklist
+
+- Configure HTTPS and secure domain.
+- Rotate and store secrets in your cloud secret manager.
+- Run database backups and restore drills.
+- Add centralized error monitoring and uptime alerts.
+- Load test critical flows (login, upload, forum, admin moderation).
+- Configure legal/compliance pages (terms, privacy, data retention).
+
 ## Team
 
 <div align="center">

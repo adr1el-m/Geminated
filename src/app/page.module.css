@@ -29,7 +29,9 @@
 }
 
 .heroContent {
+  width: 100%;
   max-width: 850px;
+  padding: 0 0.75rem;
 }
 
 .title {
@@ -59,8 +61,15 @@
 
 .ctaGroup {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.25rem;
   justify-content: center;
+}
+
+.ctaGroup a,
+.ctaGroup button {
+  min-width: 0;
+  flex: 1 1 220px;
 }
 
 .featureSection {
@@ -78,7 +87,7 @@
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 2.5rem;
 }
 
@@ -145,10 +154,60 @@
 }
 
 @media (max-width: 768px) {
+  .pageContainer {
+    padding: 0 1rem;
+    gap: 3rem;
+  }
+
+  .hero {
+    padding: 3.5rem 0;
+  }
+
+  .heroContent {
+    padding: 0;
+  }
+
   .title { font-size: 2.75rem; }
+
+  .subtitle {
+    font-size: 1.05rem;
+    margin-bottom: 2rem;
+  }
+
+  .ctaGroup {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+
+  .ctaGroup a,
+  .ctaGroup button {
+    width: 100%;
+  }
+
+  .featureGrid {
+    gap: 1.25rem;
+  }
+
   .statsCallout {
     flex-direction: column;
     gap: 3rem;
     padding: 3rem 2rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .title {
+    font-size: 2.15rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.65rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .statsCallout h4 {
+    font-size: 2.5rem;
   }
 }

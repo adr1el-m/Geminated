@@ -6,7 +6,15 @@ import mapStyles from './map.module.css';
 // Dynamically import Map to prevent SSR errors with Leaflet accessing window
 const MapWithNoSSR = dynamic(() => import('@/components/MapWrapper'), {
   ssr: false,
-  loading: () => <div className={mapStyles.loadingMap}>Loading Regional Data...</div>
+  loading: () => (
+    <div className={mapStyles.loadingMap}>
+      <div className={mapStyles.mapSkeleton}>
+        <div className={mapStyles.skeletonShimmer} />
+        <span className={mapStyles.skeletonTitle}>Loading Philippine Regional Map</span>
+        <span className={mapStyles.skeletonHint}>Preparing geospatial layers and regional markers...</span>
+      </div>
+    </div>
+  )
 });
 
 export default function RegionalMapPage() {
@@ -15,7 +23,7 @@ export default function RegionalMapPage() {
       <div className={mapStyles.header}>
         <h1 className={mapStyles.title}>Regional Teacher Profile Map</h1>
         <p className={mapStyles.subtitle}>
-          Integrated data system generating accurate regional profiles of science and mathematics teachers. 
+          Philippine-focused geospatial view of science and mathematics teacher profiles. 
           Identify underserved areas and generate actionable insights to inform strategic delivery of STAR programs.
         </p>
       </div>

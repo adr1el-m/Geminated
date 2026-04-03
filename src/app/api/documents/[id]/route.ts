@@ -3,11 +3,56 @@ import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { ensureModerationSchema } from '@/lib/community';
 import { MOCK_SEED_EMAILS } from '@/lib/constants';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function sanitizeFileName(fileName: string) {
+  const cleaned = fileName
+    .replace(/[\r\n\t]/g, '')
+    .replace(/["\\]/g, '')
+    .replace(/[^a-zA-Z0-9._()\- ]+/g, '_')
+    .trim()
+    .slice(0, 140);
+
+  return cleaned || 'document.bin';
+}
+
+function getClientIp(request: NextRequest) {
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const [first] = forwardedFor.split(',');
+    return first?.trim() || 'unknown';
+  }
+
+  return request.headers.get('x-real-ip') || 'unknown';
+}
+
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
+
+  if (!UUID_REGEX.test(id)) {
+    return new Response('Invalid document ID.', { status: 400 });
+  }
+
+  const rateLimitResult = checkRateLimit({
+    key: `download:${getClientIp(request)}`,
+    windowMs: 60 * 1000,
+    maxRequests: 40,
+  });
+
+  if (!rateLimitResult.allowed) {
+    return new Response('Too many download requests.', {
+      status: 429,
+      headers: {
+        'Retry-After': String(rateLimitResult.retryAfterSeconds),
+      },
+    });
+  }
+
   await ensureModerationSchema();
   const currentUser = await getCurrentUser();
 
@@ -50,10 +95,14 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
     return new Response('Document not found', { status: 404 });
   }
 
+  const safeFileName = sanitizeFileName(document.file_name);
+
   return new Response(new Uint8Array(document.file_data), {
     headers: {
       'Content-Type': document.mime_type,
-      'Content-Disposition': `attachment; filename="${document.file_name}"`,
+      'Content-Disposition': `attachment; filename="${safeFileName}"; filename*=UTF-8''${encodeURIComponent(safeFileName)}`,
+      'Cache-Control': 'private, no-store, max-age=0',
+      'X-Content-Type-Options': 'nosniff',
     },
   });
 }

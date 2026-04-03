@@ -85,12 +85,12 @@ body::after {
   position: fixed;
   bottom: -20%;
   right: -10%;
-  width: 60vw;
-  height: 40vw;
+  width: 46vw;
+  height: 34vw;
   z-index: -3;
   border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.14;
+  filter: blur(72px);
+  opacity: 0.1;
   background: var(--secondary-accent);
   pointer-events: none;
 }
@@ -114,10 +114,10 @@ body::after {
 .blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.16;
+  filter: blur(86px);
+  opacity: 0.14;
   mix-blend-mode: multiply;
-  animation: blobFloat 22s infinite ease-in-out;
+  animation: blobFloat 30s infinite ease-in-out;
 }
 
 [data-theme="dark"] .blob {
@@ -217,8 +217,8 @@ button {
 .card {
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.5));
-  backdrop-filter: blur(22px) saturate(155%);
-  -webkit-backdrop-filter: blur(22px) saturate(155%);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: var(--radius-lg);
   padding: 1.75rem;
@@ -243,8 +243,8 @@ button {
 
 .glass {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.45));
-  backdrop-filter: blur(24px) saturate(165%);
-  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  backdrop-filter: blur(12px) saturate(125%);
+  -webkit-backdrop-filter: blur(12px) saturate(125%);
   border: 1px solid rgba(255, 255, 255, 0.75);
   box-shadow: 0 10px 22px rgba(15, 43, 92, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
@@ -261,4 +261,37 @@ button {
 
 .animate-fade-in {
   animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .blobContainer {
+    display: none;
+  }
+
+  body::after {
+    filter: blur(40px);
+    width: 42vw;
+    height: 28vw;
+    opacity: 0.08;
+  }
+
+  .card {
+    backdrop-filter: blur(6px) saturate(110%);
+    -webkit-backdrop-filter: blur(6px) saturate(110%);
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
 }

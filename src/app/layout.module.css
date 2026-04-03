@@ -126,6 +126,7 @@
     padding: 2rem;
     gap: 2rem;
     animation: fadeIn 0.3s ease-out;
+    overflow-y: auto;
   }
 
   .navOpen .navLink {
@@ -181,11 +182,7 @@
   }
 
   .headerActions {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    position: relative;
-    z-index: 1001;
+    display: none;
   }
 
   .desktopAuth, .desktopThemeToggle {
@@ -233,7 +230,7 @@
 
 @media (max-width: 480px) {
   .logoText {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   .tagline {
     display: none;
@@ -241,6 +238,15 @@
   .container {
     padding: 0 1rem;
     height: 4rem;
+  }
+
+  .navOpen .navLink {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .mobileAuthActions {
+    max-width: 100%;
   }
 }
 

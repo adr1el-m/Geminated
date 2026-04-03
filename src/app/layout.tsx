@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import layoutStyles from './layout.module.css';
 import ThemeInit from '@/components/ThemeInit';
@@ -7,6 +7,12 @@ import { getCurrentUser } from '@/lib/auth';
 export const metadata: Metadata = {
   title: 'STAR-LINK | DOST-SEI STEM Educators Hub',
   description: 'Community-driven collaboration hub for STEM educators enriching the e-STAR.ph resource portal. Share action research, discuss challenges, and form networks.',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 import Navigation from '@/components/Navigation';

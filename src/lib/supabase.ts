@@ -1,9 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'public-anon-key'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+if (process.env.NODE_ENV === 'production' && (!supabaseUrl || !supabaseAnonKey)) {
+  throw new Error('Supabase env vars are required in production.');
+}
+
+export const supabase = createClient(
+  supabaseUrl || 'http://localhost:54321',
+  supabaseAnonKey || 'public-anon-key',
+)
 
 // In a real application, you would generate TypeScript types using the Supabase CLI
 export type Profile = {
