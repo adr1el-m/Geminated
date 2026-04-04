@@ -20,6 +20,10 @@ export async function ensureModerationSchema() {
         alter table forum_posts
         add column if not exists moderated_at timestamptz
       `;
+      await db`
+        alter table forum_posts
+        add column if not exists upvote_count integer not null default 0
+      `;
 
       await db`
         alter table resources
@@ -48,6 +52,9 @@ export async function ensureModerationSchema() {
           id uuid primary key default gen_random_uuid(),
           topic_id uuid not null references forum_posts(id) on delete cascade,
           content text not null,
+          image_mime_type text,
+          image_data bytea,
+          image_file_name text,
           author_id uuid not null references profiles(id) on delete cascade,
           created_at timestamptz not null default timezone('utc'::text, now())
         )
@@ -55,6 +62,58 @@ export async function ensureModerationSchema() {
       await db`
         create index if not exists forum_comments_topic_created_idx
         on forum_comments(topic_id, created_at asc)
+      `;
+
+      await db`
+        create table if not exists forum_post_votes (
+          id uuid primary key default gen_random_uuid(),
+          topic_id uuid not null references forum_posts(id) on delete cascade,
+          user_id uuid not null references profiles(id) on delete cascade,
+          created_at timestamptz not null default timezone('utc'::text, now()),
+          unique(topic_id, user_id)
+        )
+      `;
+      await db`
+        create index if not exists forum_post_votes_topic_idx
+        on forum_post_votes(topic_id)
+      `;
+      await db`
+        create index if not exists forum_post_votes_user_idx
+        on forum_post_votes(user_id)
+      `;
+
+      await db`
+        alter table forum_comments
+        add column if not exists image_mime_type text
+      `;
+      await db`
+        alter table forum_comments
+        add column if not exists image_data bytea
+      `;
+      await db`
+        alter table forum_comments
+        add column if not exists image_file_name text
+      `;
+
+      await db`
+        alter table resources
+        add column if not exists region text not null default 'Unspecified'
+      `;
+      await db`
+        alter table resources
+        add column if not exists subject_area text not null default 'General Science'
+      `;
+      await db`
+        alter table resources
+        add column if not exists grade_level text not null default 'Multi-level'
+      `;
+      await db`
+        alter table resources
+        add column if not exists resource_type text not null default 'Teaching Resource'
+      `;
+      await db`
+        alter table resources
+        add column if not exists keywords text[] not null default '{}'::text[]
       `;
     })().catch((error) => {
       moderationSchemaReady = null;
@@ -71,6 +130,8 @@ export type ForumTopic = {
   content: string;
   region: string;
   category: string;
+  comment_count: number;
+  upvote_count: number;
   moderation_status: ModerationStatus;
   author_id: string;
   author_name: string;
@@ -81,6 +142,11 @@ export type ResourceUpload = {
   id: string;
   title: string;
   description: string | null;
+  region: string;
+  subject_area: string;
+  grade_level: string;
+  resource_type: string;
+  keywords: string[];
   file_name: string;
   mime_type: string;
   file_size: number;
@@ -97,6 +163,9 @@ export type ForumComment = {
   id: string;
   topic_id: string;
   content: string;
+  image_mime_type: string | null;
+  image_data: Buffer | Uint8Array | string | null;
+  image_file_name: string | null;
   author_id: string;
   author_name: string;
   created_at: string;
@@ -116,6 +185,21 @@ export type ModeratedResourceResult = {
   moderation_status: Exclude<ModerationStatus, 'pending'>;
 };
 
+export type RemovedForumTopicResult = {
+  id: string;
+  title: string;
+};
+
+export type RemovedResourceResult = {
+  id: string;
+  title: string;
+};
+
+export type RemovedForumCommentResult = {
+  id: string;
+  topic_id: string;
+};
+
 export async function getForumTopics() {
   await ensureModerationSchema();
 
@@ -126,12 +210,19 @@ export async function getForumTopics() {
       p.content,
       p.region,
       p.category,
+      coalesce(fc.comment_count, 0) as comment_count,
+      coalesce(p.upvote_count, 0) as upvote_count,
       p.moderation_status,
       p.author_id,
       coalesce(u.full_name, 'Unknown Author') as author_name,
       p.created_at
     from forum_posts p
     left join profiles u on u.id = p.author_id
+    left join lateral (
+      select count(*)::int as comment_count
+      from forum_comments c
+      where c.topic_id = p.id
+    ) fc on true
     where p.moderation_status = 'approved'
     order by p.created_at desc
   `) as ForumTopic[];
@@ -147,12 +238,19 @@ export async function getForumTopics() {
       p.content,
       p.region,
       p.category,
+      coalesce(fc.comment_count, 0) as comment_count,
+      coalesce(p.upvote_count, 0) as upvote_count,
       p.moderation_status,
       p.author_id,
       coalesce(u.full_name, 'Unknown Author') as author_name,
       p.created_at
     from forum_posts p
     left join profiles u on u.id = p.author_id
+    left join lateral (
+      select count(*)::int as comment_count
+      from forum_comments c
+      where c.topic_id = p.id
+    ) fc on true
     where p.moderation_status = 'pending'
       and u.email = any(${MOCK_SEED_EMAILS})
     order by p.created_at desc
@@ -171,12 +269,19 @@ export async function getForumTopicById(id: string) {
       p.content,
       p.region,
       p.category,
+      coalesce(fc.comment_count, 0) as comment_count,
+      coalesce(p.upvote_count, 0) as upvote_count,
       p.moderation_status,
       p.author_id,
       coalesce(u.full_name, 'Unknown Author') as author_name,
       p.created_at
     from forum_posts p
     left join profiles u on u.id = p.author_id
+    left join lateral (
+      select count(*)::int as comment_count
+      from forum_comments c
+      where c.topic_id = p.id
+    ) fc on true
     where p.id = ${id}
       and p.moderation_status = 'approved'
     limit 1
@@ -193,12 +298,19 @@ export async function getForumTopicById(id: string) {
       p.content,
       p.region,
       p.category,
+      coalesce(fc.comment_count, 0) as comment_count,
+      coalesce(p.upvote_count, 0) as upvote_count,
       p.moderation_status,
       p.author_id,
       coalesce(u.full_name, 'Unknown Author') as author_name,
       p.created_at
     from forum_posts p
     left join profiles u on u.id = p.author_id
+    left join lateral (
+      select count(*)::int as comment_count
+      from forum_comments c
+      where c.topic_id = p.id
+    ) fc on true
     where p.id = ${id}
       and p.moderation_status = 'pending'
       and u.email = any(${MOCK_SEED_EMAILS})
@@ -216,6 +328,9 @@ export async function getForumCommentsByTopic(topicId: string) {
       c.id,
       c.topic_id,
       c.content,
+      c.image_mime_type,
+      c.image_data,
+      c.image_file_name,
       c.author_id,
       coalesce(u.full_name, 'Unknown Author') as author_name,
       c.created_at
@@ -236,6 +351,11 @@ export async function getResources() {
       r.id,
       r.title,
       r.description,
+      r.region,
+      r.subject_area,
+      r.grade_level,
+      r.resource_type,
+      r.keywords,
       r.file_name,
       r.mime_type,
       r.file_size,
@@ -258,6 +378,11 @@ export async function getResources() {
       r.id,
       r.title,
       r.description,
+      r.region,
+      r.subject_area,
+      r.grade_level,
+      r.resource_type,
+      r.keywords,
       r.file_name,
       r.mime_type,
       r.file_size,
@@ -285,12 +410,19 @@ export async function getPendingForumTopics() {
       p.content,
       p.region,
       p.category,
+      coalesce(fc.comment_count, 0) as comment_count,
+      coalesce(p.upvote_count, 0) as upvote_count,
       p.moderation_status,
       p.author_id,
       coalesce(u.full_name, 'Unknown Author') as author_name,
       p.created_at
     from forum_posts p
     left join profiles u on u.id = p.author_id
+    left join lateral (
+      select count(*)::int as comment_count
+      from forum_comments c
+      where c.topic_id = p.id
+    ) fc on true
     where p.moderation_status = 'pending'
     order by p.created_at asc
   `) as PendingForumTopic[];
@@ -306,6 +438,11 @@ export async function getPendingResources() {
       r.id,
       r.title,
       r.description,
+      r.region,
+      r.subject_area,
+      r.grade_level,
+      r.resource_type,
+      r.keywords,
       r.file_name,
       r.mime_type,
       r.file_size,
@@ -332,12 +469,19 @@ export async function getApprovedForumTopicsByAuthor(authorId: string) {
       p.content,
       p.region,
       p.category,
+      coalesce(fc.comment_count, 0) as comment_count,
+      coalesce(p.upvote_count, 0) as upvote_count,
       p.moderation_status,
       p.author_id,
       coalesce(u.full_name, 'Unknown Author') as author_name,
       p.created_at
     from forum_posts p
     left join profiles u on u.id = p.author_id
+    left join lateral (
+      select count(*)::int as comment_count
+      from forum_comments c
+      where c.topic_id = p.id
+    ) fc on true
     where p.author_id = ${authorId}
       and p.moderation_status = 'approved'
     order by p.created_at desc
@@ -354,6 +498,11 @@ export async function getApprovedResourcesByAuthor(authorId: string) {
       r.id,
       r.title,
       r.description,
+      r.region,
+      r.subject_area,
+      r.grade_level,
+      r.resource_type,
+      r.keywords,
       r.file_name,
       r.mime_type,
       r.file_size,
@@ -392,13 +541,23 @@ export async function createForumTopic(input: {
 export async function createForumComment(input: {
   topicId: string;
   content: string;
+  imageMimeType?: string | null;
+  imageData?: Buffer | null;
+  imageFileName?: string | null;
   authorId: string;
 }) {
   await ensureModerationSchema();
 
   const rows = (await db`
-    insert into forum_comments (topic_id, content, author_id)
-    values (${input.topicId}, ${input.content}, ${input.authorId})
+    insert into forum_comments (topic_id, content, image_mime_type, image_data, image_file_name, author_id)
+    values (
+      ${input.topicId},
+      ${input.content},
+      ${input.imageMimeType ?? null},
+      ${input.imageData ?? null},
+      ${input.imageFileName ?? null},
+      ${input.authorId}
+    )
     returning id
   `) as { id: string }[];
 
@@ -408,6 +567,11 @@ export async function createForumComment(input: {
 export async function createResourceUpload(input: {
   title: string;
   description: string | null;
+  region: string;
+  subjectArea: string;
+  gradeLevel: string;
+  resourceType: string;
+  keywords: string[];
   fileName: string;
   mimeType: string;
   fileSize: number;
@@ -420,6 +584,11 @@ export async function createResourceUpload(input: {
     insert into resources (
       title,
       description,
+      region,
+      subject_area,
+      grade_level,
+      resource_type,
+      keywords,
       file_name,
       mime_type,
       file_size,
@@ -430,6 +599,11 @@ export async function createResourceUpload(input: {
     values (
       ${input.title},
       ${input.description},
+      ${input.region},
+      ${input.subjectArea},
+      ${input.gradeLevel},
+      ${input.resourceType},
+      ${input.keywords},
       ${input.fileName},
       ${input.mimeType},
       ${input.fileSize},
@@ -479,6 +653,114 @@ export async function updateResourceModeration(input: {
     where id = ${input.id}
     returning id, author_id, title, moderation_status
   `) as ModeratedResourceResult[];
+
+  return rows[0] ?? null;
+}
+
+export async function getUserForumTopicVoteMap(topicIds: string[], userId: string) {
+  await ensureModerationSchema();
+
+  if (topicIds.length === 0) {
+    return {} as Record<string, boolean>;
+  }
+
+  const rows = (await db`
+    select topic_id
+    from forum_post_votes
+    where user_id = ${userId}
+      and topic_id = any(${topicIds})
+  `) as Array<{ topic_id: string }>;
+
+  const voteMap: Record<string, boolean> = {};
+  for (const row of rows) {
+    voteMap[row.topic_id] = true;
+  }
+
+  return voteMap;
+}
+
+export async function toggleForumTopicUpvote(input: { topicId: string; userId: string }) {
+  await ensureModerationSchema();
+
+  const existing = (await db`
+    select id
+    from forum_post_votes
+    where topic_id = ${input.topicId}
+      and user_id = ${input.userId}
+    limit 1
+  `) as Array<{ id: string }>;
+
+  if (existing[0]) {
+    await db`
+      delete from forum_post_votes
+      where topic_id = ${input.topicId}
+        and user_id = ${input.userId}
+    `;
+
+    const rows = (await db`
+      update forum_posts
+      set upvote_count = greatest(0, upvote_count - 1)
+      where id = ${input.topicId}
+      returning upvote_count
+    `) as Array<{ upvote_count: number }>;
+
+    return {
+      upvoted: false,
+      upvoteCount: rows[0]?.upvote_count ?? 0,
+    };
+  }
+
+  await db`
+    insert into forum_post_votes (topic_id, user_id)
+    values (${input.topicId}, ${input.userId})
+    on conflict (topic_id, user_id) do nothing
+  `;
+
+  const rows = (await db`
+    update forum_posts
+    set upvote_count = upvote_count + 1
+    where id = ${input.topicId}
+    returning upvote_count
+  `) as Array<{ upvote_count: number }>;
+
+  return {
+    upvoted: true,
+    upvoteCount: rows[0]?.upvote_count ?? 0,
+  };
+}
+
+export async function deleteForumTopicById(id: string) {
+  await ensureModerationSchema();
+
+  const rows = (await db`
+    delete from forum_posts
+    where id = ${id}
+    returning id, title
+  `) as RemovedForumTopicResult[];
+
+  return rows[0] ?? null;
+}
+
+export async function deleteResourceById(id: string) {
+  await ensureModerationSchema();
+
+  const rows = (await db`
+    delete from resources
+    where id = ${id}
+    returning id, title
+  `) as RemovedResourceResult[];
+
+  return rows[0] ?? null;
+}
+
+export async function deleteForumCommentById(id: string) {
+  await ensureModerationSchema();
+
+  const rows = (await db`
+    delete from forum_comments
+    where id = ${id}
+    returning id, topic_id
+  `) as RemovedForumCommentResult[];
 
   return rows[0] ?? null;
 }

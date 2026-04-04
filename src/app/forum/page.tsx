@@ -1,12 +1,14 @@
 import forumStyles from './forum.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getForumTopics } from '@/lib/community';
+import { getCurrentUser } from '@/lib/auth';
+import { deleteTopicAction, toggleTopicUpvoteAction } from '@/app/actions/community';
+import { getForumTopics, getUserForumTopicVoteMap } from '@/lib/community';
 import { PHILIPPINE_REGIONS_SHORT } from '@/lib/constants';
 import { formatDateTimeNoSeconds } from '@/lib/date-format';
 
 type PageProps = {
-  searchParams: Promise<{ submitted?: string; region?: string }>;
+  searchParams: Promise<{ submitted?: string; region?: string; sort?: string; removedTopic?: string }>;
 };
 
 function getAvatarByName(name: string) {
@@ -48,12 +50,37 @@ function ClockIcon() {
 }
 
 export default async function ForumPage({ searchParams }: PageProps) {
-  const { submitted, region } = await searchParams;
-  const topics = await getForumTopics();
+  const { submitted, region, sort, removedTopic } = await searchParams;
+  const [topics, user] = await Promise.all([getForumTopics(), getCurrentUser()]);
   const activeRegion = PHILIPPINE_REGIONS_SHORT.includes(region ?? '') ? (region as string) : null;
-  const filteredTopics = activeRegion
+  const activeSort = sort === 'most_comments' || sort === 'most_upvotes' ? sort : 'recent';
+
+  const filteredTopicsBase = activeRegion
     ? topics.filter((topic) => topic.region === activeRegion)
     : topics;
+
+  const filteredTopics = [...filteredTopicsBase].sort((a, b) => {
+    if (activeSort === 'most_comments') {
+      if (b.comment_count !== a.comment_count) return b.comment_count - a.comment_count;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+
+    if (activeSort === 'most_upvotes') {
+      if (b.upvote_count !== a.upvote_count) return b.upvote_count - a.upvote_count;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
+  const voteMap = user
+    ? await getUserForumTopicVoteMap(filteredTopics.map((topic) => topic.id), user.id)
+    : {};
+
+  const returnToParams = new URLSearchParams();
+  if (activeRegion) returnToParams.set('region', activeRegion);
+  if (activeSort !== 'recent') returnToParams.set('sort', activeSort);
+  const returnTo = `/forum${returnToParams.toString() ? `?${returnToParams.toString()}` : ''}`;
 
   return (
     <div className={forumStyles.pageContainer}>
@@ -71,7 +98,7 @@ export default async function ForumPage({ searchParams }: PageProps) {
 
       <div className={forumStyles.layout}>
         <aside className={forumStyles.sidebar}>
-          <div className="card" style={{ padding: '1rem' }}>
+          <div className={`${forumStyles.sidebarCard} card`}>
             <h3 className={forumStyles.sidebarTitle}>Regions</h3>
             <ul className={forumStyles.navLinks}>
               <li>
@@ -105,6 +132,30 @@ export default async function ForumPage({ searchParams }: PageProps) {
               </p>
             </div>
           ) : null}
+
+          {removedTopic === '1' ? (
+            <div className="card" style={{ borderColor: 'rgba(220, 38, 38, 0.25)' }}>
+              <h3 style={{ marginBottom: '0.25rem' }}>Forum topic removed</h3>
+              <p style={{ color: 'var(--text-muted)' }}>The selected topic was removed by an admin moderator.</p>
+            </div>
+          ) : null}
+
+          {activeRegion ? (
+            <div className={`${forumStyles.activeRegionBanner} card`}>
+              <strong>Viewing Region:</strong> {activeRegion}
+            </div>
+          ) : null}
+
+          <form method="get" className={forumStyles.sortBar}>
+            {activeRegion ? <input type="hidden" name="region" value={activeRegion} /> : null}
+            <label htmlFor="sort" className={forumStyles.sortLabel}>Sort by</label>
+            <select id="sort" name="sort" defaultValue={activeSort} className={forumStyles.sortSelect}>
+              <option value="recent">Most Recent</option>
+              <option value="most_comments">Most Comments</option>
+              <option value="most_upvotes">Most Upvotes</option>
+            </select>
+            <button type="submit" className="btn btn-secondary">Apply</button>
+          </form>
 
           {filteredTopics.length === 0 ? (
             <div className="card">
@@ -153,14 +204,28 @@ export default async function ForumPage({ searchParams }: PageProps) {
                     </span>
                   </div>
                   <div className={forumStyles.stats}>
-                    <span className={forumStyles.statItem}>
+                    <Link href={`/forum/${topic.id}#comment-form`} className={forumStyles.commentActionLink}>
                       <MessageIcon />
-                      New post
-                    </span>
+                      Comment ({topic.comment_count})
+                    </Link>
+                    <form action={toggleTopicUpvoteAction}>
+                      <input type="hidden" name="topicId" value={topic.id} />
+                      <input type="hidden" name="returnTo" value={returnTo} />
+                      <button type="submit" className={forumStyles.voteActionBtn}>
+                        ▲ {voteMap[topic.id] ? 'Upvoted' : 'Upvote'} ({topic.upvote_count})
+                      </button>
+                    </form>
                     <span className={forumStyles.statItem}>
                       <ClockIcon />
                       {formatDateTimeNoSeconds(topic.created_at)}
                     </span>
+                    {user?.role === 'admin' ? (
+                      <form action={deleteTopicAction}>
+                        <input type="hidden" name="topicId" value={topic.id} />
+                        <input type="hidden" name="returnTo" value={returnTo} />
+                        <button type="submit" className={forumStyles.deleteActionBtn}>Remove</button>
+                      </form>
+                    ) : null}
                   </div>
                 </div>
               </article>

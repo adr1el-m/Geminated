@@ -23,7 +23,8 @@ export default function UploadDocumentPage() {
             Upload a Document
           </h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.95rem' }}>
-            Share your research or project. Submissions are reviewed by an admin before they appear publicly. Max file size: 10MB. Supported formats: PDF, DOC, DOCX, TXT
+            Share your research or project. Include region, subject area, grade level, and resource type so others can find it faster.
+            Submissions are reviewed by an admin before they appear publicly. Max file size: 10MB. Supported formats: PDF, DOC, DOCX.
           </p>
           <DocumentUploadForm />
         </div>

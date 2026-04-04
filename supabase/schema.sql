@@ -38,6 +38,11 @@ CREATE TABLE public.resources (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
+  region TEXT NOT NULL DEFAULT 'Unspecified',
+  subject_area TEXT NOT NULL DEFAULT 'General Science',
+  grade_level TEXT NOT NULL DEFAULT 'Multi-level',
+  resource_type TEXT NOT NULL DEFAULT 'Teaching Resource',
+  keywords TEXT[] NOT NULL DEFAULT '{}'::TEXT[],
   type TEXT NOT NULL CHECK (type IN ('action_research', 'extension_project')),
   abstract TEXT,
   file_url TEXT,
@@ -77,6 +82,9 @@ CREATE TABLE public.forum_comments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   topic_id UUID NOT NULL REFERENCES public.forum_posts(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
+  image_mime_type TEXT,
+  image_data BYTEA,
+  image_file_name TEXT,
   author_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::TEXT, NOW()) NOT NULL
 );

@@ -62,6 +62,43 @@
   margin-bottom: 0.9rem;
 }
 
+.searchBar {
+  margin-bottom: 0.9rem;
+}
+
+.searchForm {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.searchLabel {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.searchControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.searchControls input {
+  flex: 1;
+  min-width: 220px;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.searchControls input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(29, 79, 145, 0.15);
+}
+
 .teacherGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -89,6 +126,10 @@
   color: var(--text-muted);
   font-size: 0.9rem;
   margin-bottom: 0.3rem;
+}
+
+.meta strong {
+  color: var(--institutional-blue);
 }
 
 .profileLink {

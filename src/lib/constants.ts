@@ -122,6 +122,47 @@ export const STAR_PARTICIPATION_STATUSES = [
   'Alumni',
 ] as const;
 
+export const RESOURCE_SUBJECT_AREAS = [
+  'General Science',
+  'Biology',
+  'Chemistry',
+  'Physics',
+  'Earth and Environmental Science',
+  'Integrated Science',
+  'Mathematics',
+  'Algebra',
+  'Geometry',
+  'Trigonometry',
+  'Statistics and Probability',
+  'Calculus',
+  'STEM Research',
+  'Robotics and Engineering',
+  'Computer Science',
+  'Data Science',
+  'Research Methods',
+  'Scientific Writing',
+  'Action Research',
+  'Extension and Community Engagement',
+] as const;
+
+export const RESOURCE_GRADE_LEVELS = [
+  'Elementary',
+  'Junior High School',
+  'Senior High School',
+  'TVL / Technical-Vocational',
+  'College / Tertiary',
+  'Multi-level',
+] as const;
+
+export const RESOURCE_TYPES = [
+  'Action Research Paper',
+  'Extension Project',
+  'Teaching Resource',
+  'Training Module',
+  'Assessment Tool',
+  'Policy / Program Brief',
+] as const;
+
 export const REGION_DIVISIONS_BY_REGION: Record<string, string[]> = {
   'CAR': [
     'Abra',

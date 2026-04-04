@@ -42,10 +42,15 @@ export type Profile = {
 export type Resource = {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
+  region: string;
+  subject_area: string;
+  grade_level: string;
+  resource_type: string;
+  keywords: string[];
   type: 'action_research' | 'extension_project';
-  abstract: string;
-  file_url: string;
+  abstract: string | null;
+  file_url: string | null;
   tags: string[]; // Subject, Region, Grade
   author_id: string;
   created_at: string;

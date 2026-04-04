@@ -59,6 +59,11 @@
   flex-grow: 1;
 }
 
+.filterActions {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
@@ -75,11 +80,16 @@
   background: rgba(29, 79, 145, 0.12);
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--primary-blue);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  max-width: 11.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .regionBadge {
@@ -106,10 +116,27 @@
   flex-grow: 1;
 }
 
+.tagsWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.metaTag {
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 0.2rem 0.6rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 .cardFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
   border-top: 1px solid var(--border);
   padding-top: 1rem;
   margin-top: 0.5rem;
@@ -166,6 +193,20 @@
   gap: 0.4rem;
 }
 
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.formGrid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 .formRow label {
   display: flex;
   flex-direction: column;
@@ -175,7 +216,10 @@
 }
 
 .formRow input,
-.formRow textarea {
+.formRow textarea,
+.formGrid input,
+.formGrid textarea,
+.formGrid select {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--background);
@@ -208,7 +252,10 @@
 }
 
 .formRow input:focus,
-.formRow textarea:focus {
+.formRow textarea:focus,
+.formGrid input:focus,
+.formGrid textarea:focus,
+.formGrid select:focus {
   border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgba(29, 79, 145, 0.14);
 }
@@ -225,6 +272,9 @@
 
   .header { flex-direction: column; gap: 1.5rem; }
   .filterBar { flex-direction: column; }
+  .filterActions { width: 100%; }
+  .filterActions :global(.btn) { flex: 1; justify-content: center; }
+  .formGrid { grid-template-columns: 1fr; }
 
   .grid {
     grid-template-columns: 1fr;

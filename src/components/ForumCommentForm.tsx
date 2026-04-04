@@ -16,16 +16,20 @@ export default function ForumCommentForm({ topicId }: ForumCommentFormProps) {
   const [state, formAction, pending] = useActionState(createCommentAction, initialState);
 
   return (
-    <form action={formAction} className={forumStyles.commentForm}>
+    <form action={formAction} className={forumStyles.commentForm} id="comment-form">
       <input type="hidden" name="topicId" value={topicId} />
       <label className={forumStyles.formBody}>
-        Add Comment
+        Add Comment (text or image)
         <textarea
           name="content"
           rows={3}
           placeholder="Share your insight, question, or recommendation."
-          required
         />
+      </label>
+
+      <label className={forumStyles.formBody}>
+        Attach Image (optional)
+        <input name="image" type="file" accept="image/png,image/jpeg,image/webp,image/gif" />
       </label>
 
       {state.error ? <p className={forumStyles.formError}>{state.error}</p> : null}

@@ -8,9 +8,10 @@ import { formatDateTimeNoSeconds } from '@/lib/date-format';
 
 type PageProps = {
   params: Promise<{ region: string }>;
+  searchParams: Promise<{ q?: string }>;
 };
 
-export default async function AdminRegionProfilePage({ params }: PageProps) {
+export default async function AdminRegionProfilePage({ params, searchParams }: PageProps) {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -29,6 +30,16 @@ export default async function AdminRegionProfilePage({ params }: PageProps) {
   }
 
   const details = await getRegionProfileDetails(region);
+  const { q } = await searchParams;
+  const teacherQuery = q?.trim() ?? '';
+  const normalizedTeacherQuery = teacherQuery.toLowerCase();
+
+  const filteredTeachers = normalizedTeacherQuery
+    ? details.teachers.filter((teacher) => (
+      teacher.fullName.toLowerCase().includes(normalizedTeacherQuery)
+      || teacher.starId.toLowerCase().includes(normalizedTeacherQuery)
+    ))
+    : details.teachers;
 
   return (
     <div className={regionStyles.pageContainer}>
@@ -118,31 +129,54 @@ export default async function AdminRegionProfilePage({ params }: PageProps) {
 
       <section>
         <h2 className={regionStyles.sectionTitle}>Teacher Directory</h2>
+        <div className={`${regionStyles.searchBar} card`}>
+          <form method="get" className={regionStyles.searchForm}>
+            <label htmlFor="teacher-search" className={regionStyles.searchLabel}>Search by teacher name or STAR ID</label>
+            <div className={regionStyles.searchControls}>
+              <input
+                id="teacher-search"
+                name="q"
+                type="search"
+                placeholder="e.g. Juana Cruz or STAR-2024-001"
+                defaultValue={teacherQuery}
+              />
+              <button type="submit" className="btn btn-secondary">Search</button>
+              {teacherQuery ? (
+                <Link href={`/admin/regions/${encodeURIComponent(region)}`} className="btn btn-secondary">Reset</Link>
+              ) : null}
+            </div>
+          </form>
+        </div>
+
         {details.teachers.length === 0 ? (
           <div className="card">
             <p className={regionStyles.empty}>No teacher records found for this region.</p>
           </div>
+        ) : filteredTeachers.length === 0 ? (
+          <div className="card">
+            <p className={regionStyles.empty}>No teachers match &quot;{teacherQuery}&quot; in this region.</p>
+          </div>
         ) : (
           <div className={regionStyles.teacherGrid}>
-            {details.teachers.map((teacher) => (
+            {filteredTeachers.map((teacher) => (
               <article key={teacher.id} className="card">
                 <div className={regionStyles.teacherHeader}>
                   <h3>{teacher.fullName}</h3>
                   <span className={regionStyles.qualityBadge}>DQ {teacher.dataQualityScore}</span>
                 </div>
-                <p className={regionStyles.meta}>STAR ID: {teacher.starId}</p>
-                <p className={regionStyles.meta}>Occupation: {teacher.occupation}</p>
-                <p className={regionStyles.meta}>Division: {teacher.division}</p>
-                <p className={regionStyles.meta}>School: {teacher.school}</p>
-                <p className={regionStyles.meta}>Qualification: {teacher.qualificationLevel}</p>
-                <p className={regionStyles.meta}>Experience: {teacher.yearsOfExperience} years</p>
-                <p className={regionStyles.meta}>Participation: {teacher.starParticipationStatus}</p>
+                <p className={regionStyles.meta}><strong>STAR ID:</strong> {teacher.starId}</p>
+                <p className={regionStyles.meta}><strong>Occupation:</strong> {teacher.occupation}</p>
+                <p className={regionStyles.meta}><strong>Division:</strong> {teacher.division}</p>
+                <p className={regionStyles.meta}><strong>School:</strong> {teacher.school}</p>
+                <p className={regionStyles.meta}><strong>Qualification:</strong> {teacher.qualificationLevel}</p>
+                <p className={regionStyles.meta}><strong>Experience:</strong> {teacher.yearsOfExperience} years</p>
+                <p className={regionStyles.meta}><strong>Participation:</strong> {teacher.starParticipationStatus}</p>
                 <p className={regionStyles.meta}>
-                  Consent: Processing {teacher.consentDataProcessing ? 'Yes' : 'No'} | Research {teacher.consentResearch ? 'Yes' : 'No'} | Opt-out {teacher.anonymizationOptOut ? 'Yes' : 'No'}
+                  <strong>Consent:</strong> Processing {teacher.consentDataProcessing ? 'Yes' : 'No'} | Research {teacher.consentResearch ? 'Yes' : 'No'} | Opt-out {teacher.anonymizationOptOut ? 'Yes' : 'No'}
                 </p>
-                <p className={regionStyles.meta}>Updated: {formatDateTimeNoSeconds(teacher.profileLastUpdatedAt)}</p>
+                <p className={regionStyles.meta}><strong>Updated:</strong> {formatDateTimeNoSeconds(teacher.profileLastUpdatedAt)}</p>
                 <p className={regionStyles.meta}>
-                  Subjects: {teacher.subjectsTaught.length > 0 ? teacher.subjectsTaught.join(', ') : 'Not specified'}
+                  <strong>Subjects:</strong> {teacher.subjectsTaught.length > 0 ? teacher.subjectsTaught.join(', ') : 'Not specified'}
                 </p>
                 <Link href={`/profile/${teacher.id}`} className={regionStyles.profileLink}>Open profile</Link>
               </article>

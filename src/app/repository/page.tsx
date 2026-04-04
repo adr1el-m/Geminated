@@ -1,11 +1,18 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import repoStyles from './repository.module.css';
+import { getCurrentUser } from '@/lib/auth';
+import { deleteResourceAction } from '@/app/actions/community';
 import { getResources } from '@/lib/community';
-import { PHILIPPINE_REGIONS_SHORT } from '@/lib/constants';
+import {
+  REGION_DISPLAY_NAMES,
+  REGISTRATION_REGIONS,
+  RESOURCE_SUBJECT_AREAS,
+} from '@/lib/constants';
+import { formatDateTimeNoSeconds } from '@/lib/date-format';
 
 type PageProps = {
-  searchParams: Promise<{ uploaded?: string }>;
+  searchParams: Promise<{ uploaded?: string; removedResource?: string; region?: string; subject?: string; q?: string }>;
 };
 
 function getAvatarByName(name: string) {
@@ -21,8 +28,39 @@ function getAvatarByName(name: string) {
 }
 
 export default async function RepositoryPage({ searchParams }: PageProps) {
-  const { uploaded } = await searchParams;
-  const resources = await getResources();
+  const { uploaded, removedResource, region, subject, q } = await searchParams;
+  const [resources, user] = await Promise.all([getResources(), getCurrentUser()]);
+  const selectedRegion = REGISTRATION_REGIONS.includes(region as (typeof REGISTRATION_REGIONS)[number]) ? region : '';
+  const selectedSubject = RESOURCE_SUBJECT_AREAS.includes(subject as (typeof RESOURCE_SUBJECT_AREAS)[number]) ? subject : '';
+  const searchTerm = String(q ?? '').trim().toLowerCase();
+
+  const filteredResources = resources.filter((project) => {
+    if (selectedRegion && project.region !== selectedRegion) {
+      return false;
+    }
+
+    if (selectedSubject && project.subject_area !== selectedSubject) {
+      return false;
+    }
+
+    if (!searchTerm) {
+      return true;
+    }
+
+    const searchable = [
+      project.title,
+      project.description ?? '',
+      project.author_name,
+      project.subject_area,
+      project.resource_type,
+      project.grade_level,
+      ...(project.keywords ?? []),
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    return searchable.includes(searchTerm);
+  });
 
   return (
     <div className={repoStyles.pageContainer}>
@@ -38,31 +76,34 @@ export default async function RepositoryPage({ searchParams }: PageProps) {
         </a>
       </div>
 
-      <div className={repoStyles.filterBar}>
-        <select className={repoStyles.filterSelect} defaultValue="">
-          <option value="" disabled>
-            Filter by Region
-          </option>
-          {PHILIPPINE_REGIONS_SHORT.map((region) => (
-            <option key={region} value={region}>{region}</option>
+      <form className={repoStyles.filterBar} method="get">
+        <select className={repoStyles.filterSelect} name="region" defaultValue={selectedRegion}>
+          <option value="">All Regions</option>
+          {REGISTRATION_REGIONS.map((optionRegion) => (
+            <option key={optionRegion} value={optionRegion}>{REGION_DISPLAY_NAMES[optionRegion] ?? optionRegion}</option>
           ))}
         </select>
 
-        <select className={repoStyles.filterSelect} defaultValue="">
-          <option value="" disabled>
-            Subject Area
-          </option>
-          <option value="Physics">Physics</option>
-          <option value="Mathematics">Mathematics</option>
-          <option value="General Science">General Science</option>
+        <select className={repoStyles.filterSelect} name="subject" defaultValue={selectedSubject}>
+          <option value="">All Subject Areas</option>
+          {RESOURCE_SUBJECT_AREAS.map((subjectArea) => (
+            <option key={subjectArea} value={subjectArea}>{subjectArea}</option>
+          ))}
         </select>
 
         <input
           type="search"
+          name="q"
+          defaultValue={q ?? ''}
           placeholder="Search keywords, authors, or topics..."
           className={repoStyles.searchInput}
         />
-      </div>
+
+        <div className={repoStyles.filterActions}>
+          <button type="submit" className="btn btn-primary">Apply</button>
+          <Link href="/repository" className="btn btn-secondary">Reset</Link>
+        </div>
+      </form>
 
       {uploaded === '1' ? (
         <div className="card" style={{ marginBottom: '1.5rem', borderColor: 'rgba(34, 139, 58, 0.3)' }}>
@@ -73,21 +114,37 @@ export default async function RepositoryPage({ searchParams }: PageProps) {
         </div>
       ) : null}
 
+      {removedResource === '1' ? (
+        <div className="card" style={{ marginBottom: '1.5rem', borderColor: 'rgba(220, 38, 38, 0.25)' }}>
+          <h3 style={{ marginBottom: '0.25rem' }}>Resource removed</h3>
+          <p style={{ color: 'var(--text-muted)' }}>The selected research or extension resource was removed by an admin moderator.</p>
+        </div>
+      ) : null}
+
       <div className={repoStyles.grid}>
-        {resources.length === 0 ? (
+        {filteredResources.length === 0 ? (
           <div className="card">
-            <h3>No documents yet</h3>
-            <p>Upload the first research or extension document to start the library.</p>
+            <h3>No matching documents</h3>
+            <p>Try changing your filters or upload a new research or extension document.</p>
           </div>
         ) : (
-          resources.map((project) => (
+          filteredResources.map((project) => (
             <div key={project.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className={repoStyles.cardHeader}>
-                <span className={repoStyles.tag}>Document</span>
-                <span className={repoStyles.regionBadge}>{new Date(project.created_at).toLocaleDateString()}</span>
+                <span className={repoStyles.tag}>{project.resource_type}</span>
+                <span className={repoStyles.regionBadge}>{formatDateTimeNoSeconds(project.created_at)}</span>
               </div>
               <h3 className={repoStyles.projectTitle}>{project.title}</h3>
               <p className={repoStyles.projectAbstract}>{project.description || 'No description provided.'}</p>
+
+              <div className={repoStyles.tagsWrap}>
+                <span className={repoStyles.metaTag}>{REGION_DISPLAY_NAMES[project.region] ?? project.region}</span>
+                <span className={repoStyles.metaTag}>{project.subject_area}</span>
+                <span className={repoStyles.metaTag}>{project.grade_level}</span>
+                {(project.keywords ?? []).slice(0, 3).map((keyword) => (
+                  <span key={keyword} className={repoStyles.metaTag}>{keyword}</span>
+                ))}
+              </div>
 
               <div className={repoStyles.cardFooter}>
                 <div className={repoStyles.authorInfo}>
@@ -112,6 +169,21 @@ export default async function RepositoryPage({ searchParams }: PageProps) {
                 <Link href={`/api/documents/${project.id}`} className="btn btn-primary" style={{ fontSize: '0.85rem' }}>
                   Download
                 </Link>
+                {user?.role === 'admin' ? (
+                  <form action={deleteResourceAction}>
+                    <input type="hidden" name="resourceId" value={project.id} />
+                    <input
+                      type="hidden"
+                      name="returnTo"
+                      value={`/repository?${new URLSearchParams({
+                        ...(selectedRegion ? { region: selectedRegion } : {}),
+                        ...(selectedSubject ? { subject: selectedSubject } : {}),
+                        ...(q ? { q: String(q) } : {}),
+                      }).toString()}`}
+                    />
+                    <button type="submit" className="btn btn-secondary" style={{ fontSize: '0.85rem' }}>Remove</button>
+                  </form>
+                ) : null}
               </div>
             </div>
           ))

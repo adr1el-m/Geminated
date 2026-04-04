@@ -9,7 +9,9 @@ import { formatDateTimeNoSeconds } from '@/lib/date-format';
 import { getNotificationsForUser, getUnreadNotificationCount } from '@/lib/notifications';
 import { markAllNotificationsReadAction } from '@/app/actions/notifications';
 
-function getAvatarByName(name: string) {
+function getAvatarByName(name: string, role: string) {
+  if (role === 'admin') return '/img/admin-profile.png';
+
   const normalized = name.toLowerCase();
 
   if (normalized.includes('janel')) return '/img/janel.jpeg';
@@ -37,9 +39,9 @@ export default async function ProfilePage() {
     <div className={profileStyles.container}>
       <header className={profileStyles.header}>
         <div className={profileStyles.avatarLarge}>
-          {getAvatarByName(profile.full_name) ? (
+          {getAvatarByName(profile.full_name, profile.role) ? (
             <Image
-              src={getAvatarByName(profile.full_name) as string}
+              src={getAvatarByName(profile.full_name, profile.role) as string}
               alt={profile.full_name}
               fill
               sizes="100px"

@@ -3,9 +3,28 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import forumStyles from '../forum.module.css';
 import { getCurrentUser } from '@/lib/auth';
+import { deleteCommentAction, deleteTopicAction } from '@/app/actions/community';
 import ForumCommentForm from '@/components/ForumCommentForm';
 import { getForumCommentsByTopic, getForumTopicById, getForumTopics } from '@/lib/community';
 import { formatDateTimeNoSeconds } from '@/lib/date-format';
+
+function toCommentImageDataUrl(value: Buffer | Uint8Array | string | null, mimeType: string | null) {
+  if (!value || !mimeType) {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    if (value.startsWith('\\x')) {
+      const hex = value.slice(2);
+      return `data:${mimeType};base64,${Buffer.from(hex, 'hex').toString('base64')}`;
+    }
+
+    return `data:${mimeType};base64,${value}`;
+  }
+
+  const binary = value instanceof Uint8Array ? Buffer.from(value) : value;
+  return `data:${mimeType};base64,${binary.toString('base64')}`;
+}
 
 function getAvatarByName(name: string) {
   const normalized = name.toLowerCase();
@@ -21,12 +40,12 @@ function getAvatarByName(name: string) {
 
 type PageProps = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ commented?: string }>;
+  searchParams: Promise<{ commented?: string; removedComment?: string }>;
 };
 
 export default async function ForumTopicPage({ params, searchParams }: PageProps) {
   const { id } = await params;
-  const { commented } = await searchParams;
+  const { commented, removedComment } = await searchParams;
   const topic = await getForumTopicById(id);
 
   if (!topic) {
@@ -45,6 +64,13 @@ export default async function ForumTopicPage({ params, searchParams }: PageProps
         <Link href="/forum" className="btn btn-secondary" style={{ marginBottom: '1rem' }}>
           Back to Forum
         </Link>
+        {user?.role === 'admin' ? (
+          <form action={deleteTopicAction} style={{ display: 'inline-flex', marginLeft: '0.6rem' }}>
+            <input type="hidden" name="topicId" value={id} />
+            <input type="hidden" name="returnTo" value="/forum" />
+            <button type="submit" className="btn btn-secondary">Remove Topic</button>
+          </form>
+        ) : null}
       </div>
 
       <article className={`${forumStyles.topicCard} card`} style={{ marginBottom: '2rem' }}>
@@ -92,6 +118,10 @@ export default async function ForumTopicPage({ params, searchParams }: PageProps
           <p className={forumStyles.commentNotice}>Comment posted successfully.</p>
         ) : null}
 
+        {removedComment === '1' ? (
+          <p className={forumStyles.commentNotice}>Comment removed successfully.</p>
+        ) : null}
+
         {user ? (
           <ForumCommentForm topicId={id} />
         ) : (
@@ -104,17 +134,38 @@ export default async function ForumTopicPage({ params, searchParams }: PageProps
           {comments.length === 0 ? (
             <p style={{ color: 'var(--text-muted)' }}>No comments yet. Be the first to contribute.</p>
           ) : (
-            comments.map((comment) => (
-              <article key={comment.id} className={forumStyles.commentItem}>
-                <div className={forumStyles.commentHeader}>
-                  <Link href={`/profile/${comment.author_id}`} className={forumStyles.authorProfileLink}>
-                    <strong>{comment.author_name}</strong>
-                  </Link>
-                  <span>{formatDateTimeNoSeconds(comment.created_at)}</span>
-                </div>
-                <p className={forumStyles.commentBody}>{comment.content}</p>
-              </article>
-            ))
+            comments.map((comment) => {
+              const imageDataUrl = toCommentImageDataUrl(comment.image_data, comment.image_mime_type);
+
+              return (
+                <article key={comment.id} className={forumStyles.commentItem}>
+                  <div className={forumStyles.commentHeader}>
+                    <Link href={`/profile/${comment.author_id}`} className={forumStyles.authorProfileLink}>
+                      <strong>{comment.author_name}</strong>
+                    </Link>
+                    <span>{formatDateTimeNoSeconds(comment.created_at)}</span>
+                  </div>
+                  {comment.content ? <p className={forumStyles.commentBody}>{comment.content}</p> : null}
+                  {imageDataUrl ? (
+                    <Image
+                      src={imageDataUrl}
+                      alt={comment.image_file_name ?? 'Comment attachment'}
+                      width={900}
+                      height={600}
+                      unoptimized
+                      className={forumStyles.commentImage}
+                    />
+                  ) : null}
+                  {user?.role === 'admin' ? (
+                    <form action={deleteCommentAction} style={{ marginTop: '0.55rem' }}>
+                      <input type="hidden" name="commentId" value={comment.id} />
+                      <input type="hidden" name="returnTo" value={`/forum/${id}`} />
+                      <button type="submit" className={forumStyles.deleteActionBtn}>Remove Comment</button>
+                    </form>
+                  ) : null}
+                </article>
+              );
+            })
           )}
         </div>
       </section>

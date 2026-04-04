@@ -128,6 +128,9 @@ create table if not exists forum_comments (
   id uuid primary key default gen_random_uuid(),
   topic_id uuid not null references forum_posts(id) on delete cascade,
   content text not null,
+  image_mime_type text,
+  image_data bytea,
+  image_file_name text,
   author_id uuid not null references profiles(id) on delete cascade,
   created_at timestamptz not null default timezone('utc'::text, now())
 );
@@ -138,6 +141,11 @@ create table if not exists resources (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   description text,
+  region text not null default 'Unspecified',
+  subject_area text not null default 'General Science',
+  grade_level text not null default 'Multi-level',
+  resource_type text not null default 'Teaching Resource',
+  keywords text[] not null default '{}'::text[],
   file_name text not null,
   mime_type text not null,
   file_size integer not null,
@@ -159,3 +167,12 @@ alter table forum_posts add column if not exists moderated_at timestamptz;
 alter table resources add column if not exists moderation_status text not null default 'pending';
 alter table resources add column if not exists moderated_by uuid references profiles(id) on delete set null;
 alter table resources add column if not exists moderated_at timestamptz;
+alter table resources add column if not exists region text not null default 'Unspecified';
+alter table resources add column if not exists subject_area text not null default 'General Science';
+alter table resources add column if not exists grade_level text not null default 'Multi-level';
+alter table resources add column if not exists resource_type text not null default 'Teaching Resource';
+alter table resources add column if not exists keywords text[] not null default '{}'::text[];
+
+alter table forum_comments add column if not exists image_mime_type text;
+alter table forum_comments add column if not exists image_data bytea;
+alter table forum_comments add column if not exists image_file_name text;
