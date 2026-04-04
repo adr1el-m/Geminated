@@ -39,6 +39,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .inputGroup label {
@@ -47,7 +48,8 @@
   color: var(--foreground);
 }
 
-.inputGroup input, .inputGroup select {
+.inputGroup input, .inputGroup select, .inputGroup textarea {
+  width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -59,14 +61,19 @@
   outline: none;
 }
 
-.inputGroup input:focus, .inputGroup select:focus {
+.inputGroup textarea {
+  resize: vertical;
+  min-height: 6rem;
+}
+
+.inputGroup input:focus, .inputGroup select:focus, .inputGroup textarea:focus {
   border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgba(29, 79, 145, 0.14);
 }
 
 .row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem;
 }
 
@@ -75,6 +82,32 @@
   width: 100%;
   padding: 0.85rem;
   font-size: 1.1rem;
+}
+
+.consentGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(63, 68, 140, 0.04);
+}
+
+.checkboxLabel {
+  display: grid;
+  grid-template-columns: 1.1rem 1fr;
+  align-items: start;
+  gap: 0.55rem;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.checkboxLabel input {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.1rem;
 }
 
 .footer {
@@ -101,6 +134,10 @@
 }
 
 @media (max-width: 600px) {
+  .container { padding: 1rem; }
   .row { grid-template-columns: 1fr; gap: 1.5rem; }
-  .authCard { padding: 2rem; }
+  .authCard {
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+  }
 }

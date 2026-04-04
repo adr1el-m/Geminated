@@ -7,23 +7,45 @@ export type UserRole = 'teacher' | 'admin';
 
 export type Profile = {
   id: string;
+  star_id: string;
   full_name: string;
   email: string;
+  occupation: string;
   region: string;
+  division: string;
   school: string;
+  qualification_level: string;
+  gender: string;
+  age_bracket: string;
   subjects_taught: string[];
+  training_history: string[];
+  star_participation_status: string;
+  consent_data_processing: boolean;
+  consent_research: boolean;
+  consent_version: string;
+  consented_at: string | null;
+  anonymization_opt_out: boolean;
+  profile_last_updated_at: string;
   years_of_experience: number;
+  data_quality_score: number;
   role: UserRole;
   created_at: string;
 };
 
 export type PublicProfile = {
   id: string;
+  star_id: string;
   full_name: string;
+  occupation: string;
   region: string;
+  division: string;
   school: string;
+  qualification_level: string;
   subjects_taught: string[];
   years_of_experience: number;
+  star_participation_status: string;
+  data_quality_score: number;
+  profile_last_updated_at: string;
   role: UserRole;
   created_at: string;
 };
@@ -70,12 +92,27 @@ export async function getCurrentUser(): Promise<Profile | null> {
   const rows = (await db`
     select
       p.id,
+      p.star_id,
       p.full_name,
       p.email,
+      p.occupation,
       p.region,
+      p.division,
       p.school,
+      p.qualification_level,
+      p.gender,
+      p.age_bracket,
       p.subjects_taught,
+      p.training_history,
+      p.star_participation_status,
+      p.consent_data_processing,
+      p.consent_research,
+      p.consent_version,
+      p.consented_at,
+      p.anonymization_opt_out,
+      p.profile_last_updated_at,
       p.years_of_experience,
+      p.data_quality_score,
       p.role,
       p.created_at
     from auth_sessions s
@@ -92,8 +129,22 @@ export async function registerUser(input: {
   fullName: string;
   email: string;
   password: string;
+  occupation: string;
   region: string;
+  division: string;
   school: string;
+  qualificationLevel: string;
+  gender: string;
+  ageBracket: string;
+  subjectsTaught: string[];
+  trainingHistory: string[];
+  yearsOfExperience: number;
+  starParticipationStatus: string;
+  consentDataProcessing: boolean;
+  consentResearch: boolean;
+  anonymizationOptOut: boolean;
+  consentVersion: string;
+  dataQualityScore: number;
 }) {
   const email = normalizeEmail(input.email);
   const existing = (await db`
@@ -107,6 +158,20 @@ export async function registerUser(input: {
     throw new Error('An account with that email already exists.');
   }
 
+  const duplicate = (await db`
+    select id
+    from profiles
+    where lower(full_name) = lower(${input.fullName.trim()})
+      and lower(school) = lower(${input.school.trim()})
+      and region = ${input.region.trim()}
+      and division = ${input.division.trim()}
+    limit 1
+  `) as { id: string }[];
+
+  if (duplicate.length > 0) {
+    throw new Error('Possible duplicate profile detected for the same name, school, region, and division.');
+  }
+
   const passwordHash = await bcrypt.hash(input.password, 10);
 
   const rows = (await db`
@@ -114,30 +179,73 @@ export async function registerUser(input: {
       full_name,
       email,
       password_hash,
+      occupation,
       region,
+      division,
       school,
+      qualification_level,
+      gender,
+      age_bracket,
       subjects_taught,
+      training_history,
+      star_participation_status,
+      consent_data_processing,
+      consent_research,
+      consent_version,
+      consented_at,
+      anonymization_opt_out,
+      profile_last_updated_at,
       years_of_experience,
+      data_quality_score,
       role
     )
     values (
       ${input.fullName.trim()},
       ${email},
       ${passwordHash},
+      ${input.occupation.trim()},
       ${input.region.trim()},
+      ${input.division.trim()},
       ${input.school.trim()},
-      ${[]},
-      ${0},
+      ${input.qualificationLevel.trim()},
+      ${input.gender.trim()},
+      ${input.ageBracket.trim()},
+      ${input.subjectsTaught},
+      ${input.trainingHistory},
+      ${input.starParticipationStatus.trim()},
+      ${input.consentDataProcessing},
+      ${input.consentResearch},
+      ${input.consentVersion.trim()},
+      ${input.consentDataProcessing ? new Date().toISOString() : null},
+      ${input.anonymizationOptOut},
+      now(),
+      ${input.yearsOfExperience},
+      ${input.dataQualityScore},
       ${'teacher'}
     )
     returning
       id,
+      star_id,
       full_name,
       email,
+      occupation,
       region,
+      division,
       school,
+      qualification_level,
+      gender,
+      age_bracket,
       subjects_taught,
+      training_history,
+      star_participation_status,
+      consent_data_processing,
+      consent_research,
+      consent_version,
+      consented_at,
+      anonymization_opt_out,
+      profile_last_updated_at,
       years_of_experience,
+      data_quality_score,
       role,
       created_at
   `) as Profile[];
@@ -157,12 +265,27 @@ export async function loginUser(input: { email: string; password: string }) {
   const rows = (await db`
     select
       id,
+      star_id,
       full_name,
       email,
+      occupation,
       region,
+      division,
       school,
+      qualification_level,
+      gender,
+      age_bracket,
       subjects_taught,
+      training_history,
+      star_participation_status,
+      consent_data_processing,
+      consent_research,
+      consent_version,
+      consented_at,
+      anonymization_opt_out,
+      profile_last_updated_at,
       years_of_experience,
+      data_quality_score,
       role,
       created_at,
       password_hash
@@ -206,10 +329,22 @@ export async function signOutUser() {
 
 export async function updateCurrentUserProfile(input: {
   fullName: string;
+  occupation: string;
   region: string;
+  division: string;
   school: string;
+  qualificationLevel: string;
+  gender: string;
+  ageBracket: string;
   subjectsTaught: string[];
+  trainingHistory: string[];
+  starParticipationStatus: string;
+  consentDataProcessing: boolean;
+  consentResearch: boolean;
+  anonymizationOptOut: boolean;
+  consentVersion: string;
   yearsOfExperience: number;
+  dataQualityScore: number;
 }) {
   const currentUser = await getCurrentUser();
 
@@ -221,19 +356,48 @@ export async function updateCurrentUserProfile(input: {
     update profiles
     set
       full_name = ${input.fullName.trim()},
+      occupation = ${input.occupation.trim()},
       region = ${input.region.trim()},
+      division = ${input.division.trim()},
       school = ${input.school.trim()},
+      qualification_level = ${input.qualificationLevel.trim()},
+      gender = ${input.gender.trim()},
+      age_bracket = ${input.ageBracket.trim()},
       subjects_taught = ${input.subjectsTaught},
-      years_of_experience = ${input.yearsOfExperience}
+      training_history = ${input.trainingHistory},
+      star_participation_status = ${input.starParticipationStatus.trim()},
+      consent_data_processing = ${input.consentDataProcessing},
+      consent_research = ${input.consentResearch},
+      consent_version = ${input.consentVersion.trim()},
+      consented_at = ${input.consentDataProcessing ? new Date().toISOString() : null},
+      anonymization_opt_out = ${input.anonymizationOptOut},
+      profile_last_updated_at = now(),
+      years_of_experience = ${input.yearsOfExperience},
+      data_quality_score = ${input.dataQualityScore}
     where id = ${currentUser.id}
     returning
       id,
+      star_id,
       full_name,
       email,
+      occupation,
       region,
+      division,
       school,
+      qualification_level,
+      gender,
+      age_bracket,
       subjects_taught,
+      training_history,
+      star_participation_status,
+      consent_data_processing,
+      consent_research,
+      consent_version,
+      consented_at,
+      anonymization_opt_out,
+      profile_last_updated_at,
       years_of_experience,
+      data_quality_score,
       role,
       created_at
   `) as Profile[];
@@ -251,11 +415,18 @@ export async function getPublicProfileById(id: string): Promise<PublicProfile | 
   const rows = (await db`
     select
       id,
+      star_id,
       full_name,
+      occupation,
       region,
+      division,
       school,
+      qualification_level,
       subjects_taught,
       years_of_experience,
+      star_participation_status,
+      data_quality_score,
+      profile_last_updated_at,
       role,
       created_at
     from profiles

@@ -1,0 +1,38 @@
+'use client';
+
+import { useActionState } from 'react';
+import forumStyles from '@/app/forum/forum.module.css';
+import { createCommentAction, type CommunityActionState } from '@/app/actions/community';
+
+const initialState: CommunityActionState = {
+  error: null,
+};
+
+type ForumCommentFormProps = {
+  topicId: string;
+};
+
+export default function ForumCommentForm({ topicId }: ForumCommentFormProps) {
+  const [state, formAction, pending] = useActionState(createCommentAction, initialState);
+
+  return (
+    <form action={formAction} className={forumStyles.commentForm}>
+      <input type="hidden" name="topicId" value={topicId} />
+      <label className={forumStyles.formBody}>
+        Add Comment
+        <textarea
+          name="content"
+          rows={3}
+          placeholder="Share your insight, question, or recommendation."
+          required
+        />
+      </label>
+
+      {state.error ? <p className={forumStyles.formError}>{state.error}</p> : null}
+
+      <button type="submit" className="btn btn-primary" disabled={pending}>
+        {pending ? 'Posting...' : 'Post Comment'}
+      </button>
+    </form>
+  );
+}

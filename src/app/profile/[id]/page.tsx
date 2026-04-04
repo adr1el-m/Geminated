@@ -69,12 +69,28 @@ export default async function PublicProfilePage({ params }: PageProps) {
         <section className={`${profileStyles.infoSection} card`}>
           <h3>Public Information</h3>
           <div className={profileStyles.infoItem}>
+            <span>STAR ID</span>
+            <strong>{profile.star_id}</strong>
+          </div>
+          <div className={profileStyles.infoItem}>
+            <span>Occupation</span>
+            <strong>{profile.occupation}</strong>
+          </div>
+          <div className={profileStyles.infoItem}>
             <span>Region</span>
             <strong>{profile.region}</strong>
           </div>
           <div className={profileStyles.infoItem}>
+            <span>Division</span>
+            <strong>{profile.division}</strong>
+          </div>
+          <div className={profileStyles.infoItem}>
             <span>School / Institution</span>
             <strong>{profile.school}</strong>
+          </div>
+          <div className={profileStyles.infoItem}>
+            <span>Highest Qualification</span>
+            <strong>{profile.qualification_level}</strong>
           </div>
           <div className={profileStyles.infoItem}>
             <span>Subjects Taught</span>
@@ -93,6 +109,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
           <div className={profileStyles.infoItem}>
             <span>Years of Experience</span>
             <strong>{profile.years_of_experience} Years</strong>
+          </div>
+          <div className={profileStyles.infoItem}>
+            <span>STAR Participation</span>
+            <strong>{profile.star_participation_status}</strong>
+          </div>
+          <div className={profileStyles.infoItem}>
+            <span>Data Quality Score</span>
+            <strong>{profile.data_quality_score}/100</strong>
           </div>
           <div className={profileStyles.infoItem}>
             <span>Member Since</span>

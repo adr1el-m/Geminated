@@ -42,6 +42,20 @@ export async function ensureModerationSchema() {
         create index if not exists resources_moderation_status_idx
         on resources(moderation_status)
       `;
+
+      await db`
+        create table if not exists forum_comments (
+          id uuid primary key default gen_random_uuid(),
+          topic_id uuid not null references forum_posts(id) on delete cascade,
+          content text not null,
+          author_id uuid not null references profiles(id) on delete cascade,
+          created_at timestamptz not null default timezone('utc'::text, now())
+        )
+      `;
+      await db`
+        create index if not exists forum_comments_topic_created_idx
+        on forum_comments(topic_id, created_at asc)
+      `;
     })().catch((error) => {
       moderationSchemaReady = null;
       throw error;
@@ -78,6 +92,29 @@ export type ResourceUpload = {
 
 export type PendingForumTopic = ForumTopic;
 export type PendingResourceUpload = ResourceUpload;
+
+export type ForumComment = {
+  id: string;
+  topic_id: string;
+  content: string;
+  author_id: string;
+  author_name: string;
+  created_at: string;
+};
+
+export type ModeratedForumTopicResult = {
+  id: string;
+  author_id: string;
+  title: string;
+  moderation_status: Exclude<ModerationStatus, 'pending'>;
+};
+
+export type ModeratedResourceResult = {
+  id: string;
+  author_id: string;
+  title: string;
+  moderation_status: Exclude<ModerationStatus, 'pending'>;
+};
 
 export async function getForumTopics() {
   await ensureModerationSchema();
@@ -169,6 +206,26 @@ export async function getForumTopicById(id: string) {
   `) as ForumTopic[];
 
   return mockFallbackRows[0] ?? null;
+}
+
+export async function getForumCommentsByTopic(topicId: string) {
+  await ensureModerationSchema();
+
+  const rows = (await db`
+    select
+      c.id,
+      c.topic_id,
+      c.content,
+      c.author_id,
+      coalesce(u.full_name, 'Unknown Author') as author_name,
+      c.created_at
+    from forum_comments c
+    left join profiles u on u.id = c.author_id
+    where c.topic_id = ${topicId}
+    order by c.created_at asc
+  `) as ForumComment[];
+
+  return rows;
 }
 
 export async function getResources() {
@@ -323,10 +380,29 @@ export async function createForumTopic(input: {
 }) {
   await ensureModerationSchema();
 
-  await db`
+  const rows = (await db`
     insert into forum_posts (title, content, region, category, moderation_status, author_id)
     values (${input.title}, ${input.content}, ${input.region}, ${input.category}, ${'pending'}, ${input.authorId})
-  `;
+    returning id
+  `) as { id: string }[];
+
+  return rows[0]?.id;
+}
+
+export async function createForumComment(input: {
+  topicId: string;
+  content: string;
+  authorId: string;
+}) {
+  await ensureModerationSchema();
+
+  const rows = (await db`
+    insert into forum_comments (topic_id, content, author_id)
+    values (${input.topicId}, ${input.content}, ${input.authorId})
+    returning id
+  `) as { id: string }[];
+
+  return rows[0]?.id;
 }
 
 export async function createResourceUpload(input: {
@@ -340,7 +416,7 @@ export async function createResourceUpload(input: {
 }) {
   await ensureModerationSchema();
 
-  await db`
+  const rows = (await db`
     insert into resources (
       title,
       description,
@@ -361,7 +437,10 @@ export async function createResourceUpload(input: {
       ${'pending'},
       ${input.authorId}
     )
-  `;
+    returning id
+  `) as { id: string }[];
+
+  return rows[0]?.id;
 }
 
 export async function updateForumTopicModeration(input: {
@@ -371,14 +450,17 @@ export async function updateForumTopicModeration(input: {
 }) {
   await ensureModerationSchema();
 
-  await db`
+  const rows = (await db`
     update forum_posts
     set
       moderation_status = ${input.status},
       moderated_by = ${input.moderatedBy},
       moderated_at = now()
     where id = ${input.id}
-  `;
+    returning id, author_id, title, moderation_status
+  `) as ModeratedForumTopicResult[];
+
+  return rows[0] ?? null;
 }
 
 export async function updateResourceModeration(input: {
@@ -388,12 +470,15 @@ export async function updateResourceModeration(input: {
 }) {
   await ensureModerationSchema();
 
-  await db`
+  const rows = (await db`
     update resources
     set
       moderation_status = ${input.status},
       moderated_by = ${input.moderatedBy},
       moderated_at = now()
     where id = ${input.id}
-  `;
+    returning id, author_id, title, moderation_status
+  `) as ModeratedResourceResult[];
+
+  return rows[0] ?? null;
 }

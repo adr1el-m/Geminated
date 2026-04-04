@@ -3,9 +3,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getForumTopics } from '@/lib/community';
 import { PHILIPPINE_REGIONS_SHORT } from '@/lib/constants';
+import { formatDateTimeNoSeconds } from '@/lib/date-format';
 
 type PageProps = {
-  searchParams: Promise<{ submitted?: string }>;
+  searchParams: Promise<{ submitted?: string; region?: string }>;
 };
 
 function getAvatarByName(name: string) {
@@ -47,8 +48,12 @@ function ClockIcon() {
 }
 
 export default async function ForumPage({ searchParams }: PageProps) {
-  const { submitted } = await searchParams;
+  const { submitted, region } = await searchParams;
   const topics = await getForumTopics();
+  const activeRegion = PHILIPPINE_REGIONS_SHORT.includes(region ?? '') ? (region as string) : null;
+  const filteredTopics = activeRegion
+    ? topics.filter((topic) => topic.region === activeRegion)
+    : topics;
 
   return (
     <div className={forumStyles.pageContainer}>
@@ -69,9 +74,23 @@ export default async function ForumPage({ searchParams }: PageProps) {
           <div className="card" style={{ padding: '1rem' }}>
             <h3 className={forumStyles.sidebarTitle}>Regions</h3>
             <ul className={forumStyles.navLinks}>
-              <li><Link href="#" className={forumStyles.active}>All Regions</Link></li>
+              <li>
+                <Link
+                  href="/forum"
+                  className={`${forumStyles.navLink} ${!activeRegion ? forumStyles.navLinkActive : ''}`.trim()}
+                >
+                  All Regions
+                </Link>
+              </li>
               {PHILIPPINE_REGIONS_SHORT.map((region) => (
-                <li key={region}><Link href="#">{region}</Link></li>
+                <li key={region}>
+                  <Link
+                    href={`/forum?region=${encodeURIComponent(region)}`}
+                    className={`${forumStyles.navLink} ${activeRegion === region ? forumStyles.navLinkActive : ''}`.trim()}
+                  >
+                    {region}
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>
@@ -87,13 +106,17 @@ export default async function ForumPage({ searchParams }: PageProps) {
             </div>
           ) : null}
 
-          {topics.length === 0 ? (
+          {filteredTopics.length === 0 ? (
             <div className="card">
-              <h3>No topics yet</h3>
-              <p>Be the first to start a discussion in the community hub.</p>
+              <h3>{activeRegion ? `No topics yet for ${activeRegion}` : 'No topics yet'}</h3>
+              <p>
+                {activeRegion
+                  ? 'No approved topics match this region yet. Try another region or start a new topic.'
+                  : 'Be the first to start a discussion in the community hub.'}
+              </p>
             </div>
           ) : (
-            topics.map((topic) => (
+            filteredTopics.map((topic) => (
               <article key={topic.id} className={`${forumStyles.topicCard} card`}>
                 <div className={forumStyles.topicHeader}>
                   <span className={forumStyles.category}>{topic.category}</span>
@@ -136,7 +159,7 @@ export default async function ForumPage({ searchParams }: PageProps) {
                     </span>
                     <span className={forumStyles.statItem}>
                       <ClockIcon />
-                      {new Date(topic.created_at).toLocaleString()}
+                      {formatDateTimeNoSeconds(topic.created_at)}
                     </span>
                   </div>
                 </div>
