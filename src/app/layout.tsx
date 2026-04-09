@@ -7,6 +7,9 @@ import { getCurrentUser } from '@/lib/auth';
 export const metadata: Metadata = {
   title: 'STAR-LINK | DOST-SEI STEM Educators Hub',
   description: 'Community-driven collaboration hub for STEM educators enriching the e-STAR.ph resource portal. Share action research, discuss challenges, and form networks.',
+  icons: {
+    icon: '/img/favicon.png',
+  },
 };
 
 export const viewport: Viewport = {
