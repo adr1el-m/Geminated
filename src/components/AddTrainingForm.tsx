@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 import { addTrainingRecordAction, type TrainingActionState } from '@/app/actions/training';
-import { TRAINING_TYPES } from '@/lib/training-records';
+import { TRAINING_TYPES } from '@/lib/constants';
 
 type Props = {
   onSuccess?: () => void;

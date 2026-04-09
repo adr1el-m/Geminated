@@ -1,14 +1,5 @@
 import { db } from './db';
-
-export const TRAINING_TYPES = [
-  'STAR Capacity-Building',
-  'Regional Workshop',
-  'National Convention',
-  'Online Course',
-  'External Workshop',
-  'Peer Learning',
-  'School-Based LAC Session',
-] as const;
+import { TRAINING_TYPES } from './constants';
 
 export type TrainingType = (typeof TRAINING_TYPES)[number];
 

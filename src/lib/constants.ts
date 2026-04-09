@@ -431,3 +431,13 @@ export const MOCK_SEED_EMAILS = [
   'christine@example.org',
   'admin@starlink.local',
 ];
+
+export const TRAINING_TYPES = [
+  'STAR Capacity-Building',
+  'Regional Workshop',
+  'National Convention',
+  'Online Course',
+  'External Workshop',
+  'Peer Learning',
+  'School-Based LAC Session',
+] as const;
