@@ -1,5 +1,4 @@
 import homeStyles from './page.module.css';
-import Link from 'next/link';
 
 export default function Loading() {
   return (

@@ -1,0 +1,25 @@
+# Disallow crawling of administrative and API routes.
+# Allow public-facing pages to be indexed.
+
+User-agent: *
+
+# Admin dashboard — not for public indexing
+Disallow: /admin/
+Disallow: /admin
+
+# API routes — internal use only
+Disallow: /api/
+
+# Authentication flows — not meaningful to index
+Disallow: /login
+Disallow: /register
+
+# User-specific pages
+Disallow: /profile
+
+# Allow everything else
+Allow: /
+
+# Point crawlers to the canonical site URL.
+# Update this to match NEXT_PUBLIC_APP_URL in your deployment.
+Sitemap: https://your-domain.example/sitemap.xml

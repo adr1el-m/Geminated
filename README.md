@@ -1,10 +1,41 @@
-## Geminated
+<div align="center">
+  <img src="public/img/favicon.png" alt="STAR-LINK Logo" width="100" height="100">
 
-## STAR-LINK: Community Collaboration Hub for STEM Educators
+  # STAR-LINK
 
-STAR-LINK is a community-driven collaboration hub designed to complement and enrich e-STAR.ph.
+  **Community Collaboration Hub for STEM Educators**
 
-While e-STAR.ph serves as a static repository of lesson exemplars and training materials, STAR-LINK adds a dynamic social layer where educators can:
+  ![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+  ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+  ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+  ![Vercel](https://img.shields.io/badge/Vercel-Deploy-000000?style=for-the-badge&logo=vercel&logoColor=white)
+  ![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)
+</div>
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Tech Stack](#tech-stack)
+3. [Repository Structure](#repository-structure)
+4. [Core Features](#core-features)
+5. [Getting Started](#getting-started)
+6. [Environment Variables](#environment-variables)
+7. [Available Scripts](#available-scripts)
+8. [UI/UX Design Direction](#uiux-design-direction)
+9. [Security Hardening](#security-hardening)
+10. [Production Readiness](#production-readiness)
+11. [Success Metrics](#success-metrics)
+12. [Delivery Phases](#delivery-phases)
+13. [Team](#team)
+
+---
+
+## Overview
+
+STAR-LINK is a community-driven collaboration hub designed to complement and enrich the e-STAR.ph platform. While e-STAR.ph serves as a static repository of lesson exemplars and training materials, STAR-LINK adds a dynamic social layer where educators can:
 
 - Share action research and extension projects
 - Discuss implementation challenges with peers
@@ -12,210 +43,345 @@ While e-STAR.ph serves as a static repository of lesson exemplars and training m
 
 The goal is to transform isolated innovations into nationally shared assets for continuous STEM education improvement.
 
-## 1. Objective
-
-Build a collaboration hub that enables STEM teachers to contribute, connect, and co-develop practices around the e-STAR.ph ecosystem.
-
-Primary outcomes:
-
+**Primary outcomes:**
 - Increase educator participation in knowledge-sharing
 - Support region-specific problem solving
 - Provide evidence-based insights for STAR program planning
 
-## 2. UI/UX Alignment with e-STAR.ph
+---
 
-Even though the current e-STAR.ph portal is not publicly accessible, STAR-LINK will follow a design language consistent with typical DOST-SEI resource portals: clear, professional, and usability-focused.
+## Tech Stack
 
-### 2.1 Visual Direction
+### Core Framework
 
-- Color palette: blue/green/white aligned with DOST-SEI branding
-- Typography: professional, accessible sans-serif stack
-- Accessibility: strong contrast, readable type scale, and keyboard-friendly navigation
+| Layer | Technology | Version | Purpose |
+|:------|:-----------|:--------|:--------|
+| Framework | ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white) | 16.2 | Server-side rendering, routing, API routes |
+| UI Library | ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) | 19.2 | Component-based user interface |
+| Language | ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) | 5.x | Static type safety across the codebase |
+| Styling | ![CSS Modules](https://img.shields.io/badge/CSS_Modules-1572B6?style=flat&logo=css3&logoColor=white) | -- | Scoped component styles with shared design tokens |
 
-### 2.2 Navigation Model
+### Data and Authentication
 
-- Preferred: add a new Community section within the existing e-STAR.ph menu
+| Layer | Technology | Version | Purpose |
+|:------|:-----------|:--------|:--------|
+| Database | ![Neon Postgres](https://img.shields.io/badge/Neon_Postgres-00E599?style=flat&logo=postgresql&logoColor=white) | -- | Serverless managed relational data store |
+| Query Layer | ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat&logo=drizzle&logoColor=black) | 0.45 | Type-safe SQL queries and schema management |
+| Database Driver | ![Neon Serverless](https://img.shields.io/badge/Neon_Serverless-00E599?style=flat&logo=postgresql&logoColor=white) | 1.x | HTTP-based PostgreSQL driver for edge/serverless |
+| Schema Tooling | ![Drizzle Kit](https://img.shields.io/badge/Drizzle_Kit-C5F74F?style=flat&logo=drizzle&logoColor=black) | 0.31 | Migration generation and schema push |
+| Authentication | ![Custom Auth](https://img.shields.io/badge/Custom_Auth-000000?style=flat) | -- | Server actions with bcryptjs password hashing |
+| Auth Integration | ![NextAuth](https://img.shields.io/badge/NextAuth.js-000000?style=flat&logo=nextdotjs&logoColor=white) | 5.0-beta | Available for OAuth/social login expansion |
+
+### Maps, Visualization, and Reporting
+
+| Layer | Technology | Version | Purpose |
+|:------|:-----------|:--------|:--------|
+| Maps | ![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=flat&logo=leaflet&logoColor=white) | 1.9 / 5.0 | Interactive geospatial map and collaboration overlays |
+| Charts | ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?style=flat) | 3.8 | Admin dashboard analytics visualizations |
+| PDF Export | ![jsPDF](https://img.shields.io/badge/jsPDF-FF0000?style=flat) | 4.2 / 5.0 | Server-side and client-side report generation |
+| Geospatial Data | ![GeoJSON](https://img.shields.io/badge/GeoJSON-333333?style=flat) | -- | Regional boundary rendering on the collaboration map |
+
+### File Storage
+
+| Layer | Technology | Version | Purpose |
+|:------|:-----------|:--------|:--------|
+| Document Storage | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white) | -- | Binary document storage for current uploads |
+| Blob Storage | ![Vercel Blob](https://img.shields.io/badge/Vercel_Blob-000000?style=flat&logo=vercel&logoColor=white) | 2.3 | Available for large file offloading |
+
+### Tooling and Quality
+
+| Layer | Technology | Version | Purpose |
+|:------|:-----------|:--------|:--------|
+| Linter | ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=flat&logo=eslint&logoColor=white) | 9.x | Static analysis and Next.js-specific rules |
+| Type Checker | ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) | 5.x | Pre-build type validation |
+| CI Pipeline | ![NPM](https://img.shields.io/badge/NPM-CB3837?style=flat&logo=npm&logoColor=white) | -- | Lint, typecheck, and build in a single command |
+
+---
+
+## Repository Structure
+
+```
+Geminated/
+├── public/
+│   ├── data/
+│   │   └── philippines-adm1.geojson    # Regional boundary data for collaboration map
+│   └── img/
+│       ├── favicon.png                 # Application favicon and branding mark
+│       └── *.jpeg / *.jpg / *.png      # Team member and profile images
+│
+├── scripts/
+│   └── seed-neon.mjs                   # Database seed script for Neon Postgres
+│
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx                  # Root layout with navigation and theme
+│   │   ├── page.tsx                    # Landing page
+│   │   ├── globals.css                 # Global styles and design tokens
+│   │   ├── loading.tsx                 # App-wide loading skeleton
+│   │   │
+│   │   ├── actions/                    # Server actions
+│   │   │   ├── auth.ts                 # Authentication (login, register, logout)
+│   │   │   ├── community.ts           # Forum posts, replies, moderation
+│   │   │   ├── bulk-import.ts          # CSV/bulk data import processing
+│   │   │   ├── feedback.ts            # Program feedback submission
+│   │   │   ├── notifications.ts       # User notification management
+│   │   │   ├── program-delivery.ts    # Program delivery tracking
+│   │   │   └── training.ts            # Training record management
+│   │   │
+│   │   ├── admin/                      # Admin dashboard and management
+│   │   │   ├── page.tsx               # Main admin panel (analytics, moderation)
+│   │   │   ├── BulkImportTabContent.tsx
+│   │   │   ├── DeliveryTabContent.tsx
+│   │   │   └── regions/              # Region-specific admin views
+│   │   │
+│   │   ├── api/                        # API route handlers
+│   │   │   ├── health/               # Health probe endpoint
+│   │   │   ├── documents/            # Document download endpoint
+│   │   │   ├── map/                  # Map data API
+│   │   │   └── admin/
+│   │   │       ├── reports/          # PDF report generation
+│   │   │       └── bulk-import-template/
+│   │   │
+│   │   ├── forum/                      # Regional discussion forums
+│   │   ├── hub/                        # Community resource hub
+│   │   ├── login/                      # Authentication - sign in
+│   │   ├── register/                   # Authentication - registration
+│   │   ├── map/                        # Collaboration map view
+│   │   ├── profile/                    # Teacher profile management
+│   │   ├── programs/                   # STAR program listings
+│   │   ├── repository/                 # Action research and extension repository
+│   │   └── terms/                      # Terms of service
+│   │
+│   ├── components/                     # Shared UI components
+│   │   ├── Navigation.tsx             # App-wide navigation bar
+│   │   ├── ThemeToggle.tsx            # Light/dark mode toggle
+│   │   ├── ThemeInit.tsx              # Theme initialization on load
+│   │   ├── MapWrapper.tsx             # Leaflet map container
+│   │   ├── DocumentUploadForm.tsx     # File upload interface
+│   │   ├── ProfileEditForm.tsx        # Profile editing form
+│   │   ├── ExportDropdown.tsx         # Report export controls
+│   │   ├── ForumCommentForm.tsx       # Forum reply input
+│   │   ├── NewTopicForm.tsx           # Forum topic creation
+│   │   ├── AddTrainingForm.tsx        # Training record entry
+│   │   ├── TermsModal.tsx             # Terms acceptance modal
+│   │   └── charts/
+│   │       ├── OverviewDashboard.tsx  # Admin analytics overview
+│   │       └── RegionCompare.tsx      # Region comparison charts
+│   │
+│   └── lib/                            # Shared libraries and utilities
+│       ├── db.ts                      # Database connection pool
+│       ├── db/
+│       │   └── schema.sql             # Full database schema (DDL)
+│       ├── auth.ts                    # Session management utilities
+│       ├── rate-limit.ts              # Rate limiting middleware
+│       ├── audit.ts                   # Audit trail logging
+│       ├── community.ts              # Forum query helpers
+│       ├── constants.ts              # App-wide constants and enums
+│       ├── bulk-import.ts            # CSV parsing and validation
+│       ├── notifications.ts          # Notification query helpers
+│       ├── profile-quality.ts        # Profile completeness scoring
+│       ├── program-delivery.ts       # Delivery tracking queries
+│       ├── program-feedback.ts       # Feedback aggregation
+│       ├── training-records.ts       # Training data queries
+│       ├── regional-insights.ts      # Regional analytics engine
+│       ├── data-dictionary.ts        # Field metadata definitions
+│       ├── date-format.ts            # Date formatting utilities
+│       ├── request-meta.ts           # Request metadata extraction
+│       ├── map-boundaries.ts         # GeoJSON boundary processing
+│       ├── map-regions.ts            # Region mapping configuration
+│       └── map-timeline.ts           # Collaboration timeline data
+│
+├── supabase/                           # Supabase configuration (reserved)
+├── .env.example                        # Required environment variables
+├── eslint.config.mjs                   # ESLint configuration
+├── next.config.ts                      # Next.js configuration with security headers
+├── tsconfig.json                       # TypeScript compiler options
+└── package.json                        # Dependencies and scripts
+```
+
+---
+
+## Core Features
+
+### Teacher Profiles
+
+- Registration via DepEd email or standard email
+- Profile fields: region, school, subjects taught, years of experience, optional e-STAR.ph account link
+- Role-based access: Teacher and Admin
+- Profile completeness scoring
+
+### Action Research and Extension Repository
+
+- Upload action research papers (PDF) with metadata: title, abstract, keywords
+- Extension project entries for science fairs, training modules, and community outreach
+- Filtering by region, subject, and grade level
+
+### Regional Discussion Forums
+
+- Dedicated forum spaces organized by region
+- Thread creation, replies, and topic tagging
+- Trending topics view for surfacing urgent field needs
+
+### Collaboration Map
+
+- Interactive map view of educator interaction clusters across the Philippines
+- Collaboration density tracking by geography
+- Identification of isolated schools with low activity for Twinning intervention targeting
+
+### Admin Dashboard
+
+- Aggregate analytics: active users, most downloaded resources, most discussed topics, collaboration density
+- Regional comparison charts and trend analysis
+- Exportable PDF reports for annual planning and resource allocation
+- Bulk import for educator data via CSV
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18.x or later
+- npm 9.x or later
+- A PostgreSQL database (Neon Postgres recommended)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/geminated.git
+cd geminated
+
+# Install dependencies
+npm install
+
+# Copy environment variables
+cp .env.example .env.local
+
+# Run database migrations and seed data
+npm run seed
+
+# Start the development server
+npm run dev
+```
+
+The application will be available at `http://localhost:3000`.
+
+---
+
+## Environment Variables
+
+Create a `.env.local` file based on `.env.example`:
+
+| Variable | Required | Description |
+|:---------|:---------|:------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string (Neon format) |
+| `NEXT_PUBLIC_APP_URL` | No | Public-facing application URL for deployments |
+
+---
+
+## Available Scripts
+
+| Command | Description |
+|:--------|:------------|
+| `npm run dev` | Start the Next.js development server |
+| `npm run build` | Create an optimized production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Run ESLint static analysis |
+| `npm run typecheck` | Run TypeScript type checking without emitting |
+| `npm run ci` | Run lint, typecheck, and build sequentially |
+| `npm run seed` | Seed the database with initial data |
+
+---
+
+## UI/UX Design Direction
+
+### Visual Identity
+
+- Color palette aligned with DOST-SEI branding: blue, green, white with institutional tones
+- Professional, accessible sans-serif typography
+- Strong contrast ratios, readable type scale, and keyboard-friendly navigation
+- Light and dark mode support with persistent user preference
+
+### Navigation Model
+
+- Preferred: integrated Community section within the existing e-STAR.ph menu structure
 - Fallback: standalone STAR-LINK site with a persistent header link back to e-STAR.ph
-- Experience goal: both platforms should feel like one ecosystem
+- Experience goal: both platforms should feel like a single ecosystem
 
-### 2.3 Responsive Strategy
+### Responsive Strategy
 
-- Mobile-first layouts for low-bandwidth and smartphone-heavy usage contexts
-- Progressive enhancement for tablet/desktop dashboards and data views
+- Mobile-first layouts optimized for low-bandwidth and smartphone-heavy usage contexts
+- Progressive enhancement for tablet and desktop dashboards and data views
 
-## 3. Core MVP Features
+---
 
-### 3.1 Teacher Profiles
+## Security Hardening
 
-- Sign-up via DepEd email or standard email registration
-- Profile fields:
-  - Region
-  - School
-  - Subjects taught
-  - Years of experience
-  - Optional e-STAR.ph account link
-- Role support: teacher and admin
+### Application-Level Headers
 
-### 3.2 Action Research and Extension Repository
+Configured via `next.config.ts`:
 
-- Upload action research papers (PDF)
-- Capture metadata: title, abstract, keywords
-- Upload extension project entries (e.g., science fair, training module, community outreach)
-- Tagging and filtering:
-  - Region
-  - Subject
-  - Grade level
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy` -- locks camera, microphone, and geolocation
+- `Cross-Origin-Opener-Policy`, `Cross-Origin-Resource-Policy`
+- `Strict-Transport-Security` enabled in production
 
-### 3.3 Regional Discussion Forums
+### Rate Limiting
 
-- Dedicated forum spaces by region (or division, when needed)
-- Features:
-  - Thread creation and replies
-  - Topic tagging
-  - Trending topics view
-- Value: surfaces urgent field needs for program managers
+- Authentication and community server actions are protected with rate limiting
+- Document download endpoint includes UUID validation, download rate limiting, filename sanitization, and private/no-store caching
 
-### 3.4 Collaboration Map
+---
 
-- Map view of interaction clusters among educators and schools
-- Track collaboration density by geography
-- Detect isolated schools with low activity for Twinning intervention targeting
+## Production Readiness
 
-### 3.5 Admin Dashboard
+### Operational Health
 
-- Aggregate analytics:
-  - Active users
-  - Most downloaded/shared resources
-  - Most discussed topics
-  - Collaboration density by region
-- Exportable reports for annual planning and resource allocation
+- Health probe endpoint: `GET /api/health`
+- CI-safe validation pipeline: `npm run ci`
 
-## 4. Technical Approach
+### Go-Live Checklist
 
-### 4.1 Frontend
+- [ ] Configure HTTPS and secure domain
+- [ ] Rotate and store secrets in a cloud secret manager
+- [ ] Run database backup and restore drills
+- [ ] Add centralized error monitoring and uptime alerts
+- [ ] Load test critical flows (login, upload, forum, admin moderation)
+- [ ] Configure legal and compliance pages (terms, privacy, data retention)
 
-- React (recommended) or Vue
-- Component library and theme tokens aligned to e-STAR.ph visual identity
-- Key priorities:
-  - Fast loading on mobile networks
-  - Accessible forms and forum interactions
-  - Search and filter usability
+---
 
-### 4.2 Backend
+## Success Metrics
 
-- Node.js + Express (recommended) or Django REST Framework
-- REST API for profiles, resources, forums, analytics, and map data
-
-### 4.3 Database
-
-- PostgreSQL as primary data store
-- PostGIS extension for collaboration map and geospatial analytics
-
-### 4.4 Authentication and Authorization
-
-- Email/password authentication
-- Role-based access control:
-  - Teacher
-  - Admin
-
-## 4.5 Current Tech Stack (Implemented)
-
-- Framework: Next.js 16 (App Router)
-- UI Library: React 19
-- Language: TypeScript
-- Styling: CSS Modules + global CSS
-- Authentication: Custom email/password auth + session cookies
-- Password Hashing: bcryptjs
-- Database: Neon Postgres (PostgreSQL)
-- Query Layer: `@neondatabase/serverless` + `drizzle-orm`
-- File Storage:
-  - Binary documents in PostgreSQL (`bytea`) for current uploads
-  - `@vercel/blob` available for blob storage integration
-- Maps and Geospatial UI: Leaflet + React Leaflet
-- Optional Auth Integration Available: NextAuth v5 beta (installed)
-- Tooling:
-  - ESLint 9 + `eslint-config-next`
-  - TypeScript 5
-  - Drizzle Kit (schema/migration tooling)
-  - npm scripts: `dev`, `build`, `start`, `lint`, `seed`
-
-## 5. Success Metrics
-
-### 5.1 Adoption
+### Adoption
 
 - Number of registered teachers
 - Monthly active contributors to repository and forums
 
-### 5.2 Collaboration
+### Collaboration
 
 - Growth in cross-school interactions
 - Increase in mentorship requests and fulfilled collaborations
 
-### 5.3 Insights
+### Insights
 
 - Number and quality of admin-generated reports
 - Demonstrated impact of dashboard insights on STAR annual planning
 
-## 6. Suggested MVP Delivery Phases
+---
 
-### Phase 1: Foundation
+## Delivery Phases
 
-- User registration/login
-- Teacher profiles
-- Basic resource upload and listing
+| Phase | Scope | Status |
+|:------|:------|:-------|
+| Phase 1 -- Foundation | User registration/login, teacher profiles, basic resource upload and listing | Complete |
+| Phase 2 -- Community Layer | Regional forums, trending topics, moderation basics | Complete |
+| Phase 3 -- Intelligence Layer | Collaboration map, admin analytics dashboard, report export workflows | Complete |
 
-### Phase 2: Community Layer
-
-- Regional forums
-- Trending topics
-- Moderation basics
-
-### Phase 3: Intelligence Layer
-
-- Collaboration map
-- Admin analytics dashboard
-- Report export workflows
-
-## 7. Production and Commercial Readiness
-
-### 7.1 Security Hardening Included
-
-- App-wide security headers via Next.js config:
-  - `X-Frame-Options: DENY`
-  - `X-Content-Type-Options: nosniff`
-  - `Referrer-Policy: strict-origin-when-cross-origin`
-  - `Permissions-Policy` locks camera/mic/geolocation
-  - `Cross-Origin-Opener-Policy`, `Cross-Origin-Resource-Policy`
-  - `Strict-Transport-Security` in production
-- Auth and community server actions protected with rate limiting
-- Document download endpoint hardened with:
-  - UUID validation
-  - download rate limiting
-  - filename sanitization
-  - private/no-store caching
-
-### 7.2 Environment and Configuration
-
-- Use `.env.example` as the baseline for required deployment variables.
-- `DATABASE_URL` is required.
-
-### 7.3 Operational Health and Deploy Checks
-
-- Health probe endpoint: `GET /api/health`
-- CI-safe scripts:
-  - `npm run lint`
-  - `npm run typecheck`
-  - `npm run build`
-  - `npm run ci` (runs all checks above)
-
-### 7.4 Go-Live Checklist
-
-- Configure HTTPS and secure domain.
-- Rotate and store secrets in your cloud secret manager.
-- Run database backups and restore drills.
-- Add centralized error monitoring and uptime alerts.
-- Load test critical flows (login, upload, forum, admin moderation).
-- Configure legal/compliance pages (terms, privacy, data retention).
+---
 
 ## Team
 
@@ -223,21 +389,21 @@ Even though the current e-STAR.ph portal is not publicly accessible, STAR-LINK w
   <table border="0" cellpadding="14" cellspacing="0" style="border-collapse: collapse;">
     <tr>
       <td align="center" style="border: 1px solid #30363d; width: 220px;">
-        <img src="public/img/janel.jpeg" alt="Janel Rose Trongcoso" width="120" height="120" style="object-fit: cover;"><br><br>
+        <img src="public/img/janel.jpeg" alt="Janel Rose Trongcoso" width="120" height="120" style="object-fit: cover;"><br>
         <strong>Janel Rose Trongcoso</strong><br>
         <a href="https://www.linkedin.com/in/janel-rose-trongcoso-24467b23a/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
       </td>
       <td align="center" style="border: 1px solid #30363d; width: 220px;">
-        <img src="public/img/gem.jpeg" alt="Gem Christian Lazo" width="120" height="120" style="object-fit: cover;"><br><br>
+        <img src="public/img/gem.jpeg" alt="Gem Christian Lazo" width="120" height="120" style="object-fit: cover;"><br>
         <strong>Gem Christian Lazo</strong><br>
         <a href="https://www.linkedin.com/in/gemchristianolazo/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
       </td>
       <td align="center" style="border: 1px solid #30363d; width: 220px;">
-        <img src="public/img/adriel.jpg" alt="Adriel Magalona" width="120" height="120" style="object-fit: cover;"><br><br>
+        <img src="public/img/adriel.jpg" alt="Adriel Magalona" width="120" height="120" style="object-fit: cover;"><br>
         <strong>Adriel Magalona</strong><br>
         <a href="https://www.linkedin.com/in/adr1el/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
@@ -249,14 +415,14 @@ Even though the current e-STAR.ph portal is not publicly accessible, STAR-LINK w
   <table border="0" cellpadding="14" cellspacing="0" style="border-collapse: collapse; margin-top: 12px;">
     <tr>
       <td align="center" style="border: 1px solid #30363d; width: 220px;">
-        <img src="public/img/marti.jpeg" alt="Marti Kier Trance" width="120" height="120" style="object-fit: cover;"><br><br>
+        <img src="public/img/marti.jpeg" alt="Marti Kier Trance" width="120" height="120" style="object-fit: cover;"><br>
         <strong>Marti Kier Trance</strong><br>
         <a href="https://www.linkedin.com/in/marti-kier-trance-125371370/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
       </td>
       <td align="center" style="border: 1px solid #30363d; width: 220px;">
-        <img src="public/img/christine.jpeg" alt="Christine Rio" width="120" height="120" style="object-fit: cover;"><br><br>
+        <img src="public/img/christine.jpeg" alt="Christine Rio" width="120" height="120" style="object-fit: cover;"><br>
         <strong>Christine Rio</strong><br>
         <a href="https://www.linkedin.com/in/riochristine/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">

@@ -1,3 +1,19 @@
+/**
+ * In-process rate limiter using a module-level Map.
+ *
+ * WARNING — Serverless / edge deployments:
+ * Each serverless function invocation (Vercel Functions, AWS Lambda, etc.)
+ * may run in a separate process with an empty store. This means the limiter
+ * provides best-effort protection in those environments but is NOT guaranteed
+ * to enforce limits across concurrent or distributed invocations.
+ *
+ * For strict distributed rate limiting, replace this module with a Redis-backed
+ * implementation, e.g. using Upstash Redis with the @upstash/ratelimit library.
+ *
+ * In long-lived Node.js server deployments (e.g. Docker / standalone Next.js)
+ * this limiter is fully effective as the process remains resident.
+ */
+
 type Bucket = {
   count: number;
   resetAt: number;

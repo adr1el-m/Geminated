@@ -1,8 +1,8 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getCurrentUser, hasAcceptedLatestTerms } from '@/lib/auth';
 import { generateBulkImportTemplate } from '@/lib/bulk-import';
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   const user = await getCurrentUser();
 
   if (!user || user.role !== 'admin' || !hasAcceptedLatestTerms(user)) {

@@ -1,4 +1,4 @@
-import type { NextRequest } from 'next/server';
+
 import { getCurrentUser, hasAcceptedLatestTerms } from '@/lib/auth';
 import { REGION_DISPLAY_NAMES } from '@/lib/constants';
 import { getRegionalInsightsDashboard } from '@/lib/regional-insights';
@@ -28,7 +28,7 @@ function formatDate(date: Date) {
   });
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -112,7 +112,6 @@ export async function GET(request: NextRequest) {
   doc.text('Teacher composition, STAR access, and priority indicators per region.', 20, 27);
 
   const coverageByRegion = new Map(insights.coverageGaps.map((item) => [item.region, item]));
-  const recommendationsByRegion = new Map(insights.programRecommendations.map((item) => [item.region, item]));
 
   const regionalRows = insights.topPriorityRegions.map((item) => {
     const seg = insights.needsSegmentation.find((s) => s.region === item.region);
