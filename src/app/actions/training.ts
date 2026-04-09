@@ -2,7 +2,8 @@
 
 import { redirect } from 'next/navigation';
 import { getCurrentUser, hasAcceptedLatestTerms } from '@/lib/auth';
-import { addTrainingRecord, TRAINING_TYPES } from '@/lib/training-records';
+import { addTrainingRecord } from '@/lib/training-records';
+import { TRAINING_TYPES } from '@/lib/constants';
 
 export type TrainingActionState = {
   error: string | null;
