@@ -62,194 +62,30 @@ The goal is to transform isolated innovations into nationally shared assets for 
 
 ## Tech Stack
 
-### Core Framework
+### Unified Tech Stack
 
-<table width="100%">
-  <thead>
-    <tr>
-      <th width="15%" align="left">Layer</th>
-      <th width="25%" align="left">Technology</th>
-      <th width="15%" align="left">Version</th>
-      <th width="45%" align="left">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Framework</td>
-      <td><img src="https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white" alt="Next.js"></td>
-      <td>16.2</td>
-      <td>Server-side rendering, routing, API routes</td>
-    </tr>
-    <tr>
-      <td>UI Library</td>
-      <td><img src="https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB" alt="React"></td>
-      <td>19.2</td>
-      <td>Component-based user interface</td>
-    </tr>
-    <tr>
-      <td>Language</td>
-      <td><img src="https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white" alt="TypeScript"></td>
-      <td>5.x</td>
-      <td>Static type safety across the codebase</td>
-    </tr>
-    <tr>
-      <td>Styling</td>
-      <td><img src="https://img.shields.io/badge/CSS_Modules-1572B6?style=flat&logo=css3&logoColor=white" alt="CSS Modules"></td>
-      <td>--</td>
-      <td>Scoped component styles with shared design tokens</td>
-    </tr>
-  </tbody>
-</table>
+| Category | Layer | Technology | Version | Purpose |
+|:---|:---|:---|:---|:---|
+| **Core Framework** | Framework | ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white) | 16.2 | Server-side rendering, routing, API routes |
+| | UI Library | ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) | 19.2 | Component-based user interface |
+| | Language | ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) | 5.x | Static type safety across the codebase |
+| | Styling | ![CSS Modules](https://img.shields.io/badge/CSS_Modules-1572B6?style=flat&logo=css3&logoColor=white) | -- | Scoped component styles with shared design tokens |
+| **Data & Auth** | Database | ![Neon Postgres](https://img.shields.io/badge/Neon_Postgres-00E599?style=flat&logo=postgresql&logoColor=white) | -- | Serverless managed relational data store |
+| | Query Layer | ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat&logo=drizzle&logoColor=black) | 0.45 | Type-safe SQL queries and schema management |
+| | Database Driver | ![Neon Serverless](https://img.shields.io/badge/Neon_Serverless-00E599?style=flat&logo=postgresql&logoColor=white) | 1.x | HTTP-based PostgreSQL driver for edge/serverless |
+| | Schema Tooling | ![Drizzle Kit](https://img.shields.io/badge/Drizzle_Kit-C5F74F?style=flat&logo=drizzle&logoColor=black) | 0.31 | Migration generation and schema push |
+| | Authentication | ![Custom Auth](https://img.shields.io/badge/Custom_Auth-000000?style=flat) | -- | Server actions with bcryptjs password hashing |
+| | Auth Integration | ![NextAuth](https://img.shields.io/badge/NextAuth.js-000000?style=flat&logo=nextdotjs&logoColor=white) | 5.0-beta | Available for OAuth/social login expansion |
+| **Maps & Reporting** | Maps | ![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=flat&logo=leaflet&logoColor=white) | 1.9 / 5.0 | Interactive geospatial map and collaboration overlays |
+| | Charts | ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?style=flat) | 3.8 | Admin dashboard analytics visualizations |
+| | PDF Export | ![jsPDF](https://img.shields.io/badge/jsPDF-FF0000?style=flat) | 4.2 / 5.0 | Server-side and client-side report generation |
+| | Geospatial Data | ![GeoJSON](https://img.shields.io/badge/GeoJSON-333333?style=flat) | -- | Regional boundary rendering on the collaboration map |
+| **File Storage** | Document Storage | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white) | -- | Binary document storage for current uploads |
+| | Blob Storage | ![Vercel Blob](https://img.shields.io/badge/Vercel_Blob-000000?style=flat&logo=vercel&logoColor=white) | 2.3 | Available for large file offloading |
+| **Tooling & Quality** | Linter | ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=flat&logo=eslint&logoColor=white) | 9.x | Static analysis and Next.js-specific rules |
+| | Type Checker | ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) | 5.x | Pre-build type validation |
+| | CI Pipeline | ![NPM](https://img.shields.io/badge/NPM-CB3837?style=flat&logo=npm&logoColor=white) | -- | Lint, typecheck, and build in a single command |
 
-### Data and Authentication
-
-<table width="100%">
-  <thead>
-    <tr>
-      <th width="15%" align="left">Layer</th>
-      <th width="25%" align="left">Technology</th>
-      <th width="15%" align="left">Version</th>
-      <th width="45%" align="left">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Database</td>
-      <td><img src="https://img.shields.io/badge/Neon_Postgres-00E599?style=flat&logo=postgresql&logoColor=white" alt="Neon Postgres"></td>
-      <td>--</td>
-      <td>Serverless managed relational data store</td>
-    </tr>
-    <tr>
-      <td>Query Layer</td>
-      <td><img src="https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat&logo=drizzle&logoColor=black" alt="Drizzle ORM"></td>
-      <td>0.45</td>
-      <td>Type-safe SQL queries and schema management</td>
-    </tr>
-    <tr>
-      <td>Database Driver</td>
-      <td><img src="https://img.shields.io/badge/Neon_Serverless-00E599?style=flat&logo=postgresql&logoColor=white" alt="Neon Serverless"></td>
-      <td>1.x</td>
-      <td>HTTP-based PostgreSQL driver for edge/serverless</td>
-    </tr>
-    <tr>
-      <td>Schema Tooling</td>
-      <td><img src="https://img.shields.io/badge/Drizzle_Kit-C5F74F?style=flat&logo=drizzle&logoColor=black" alt="Drizzle Kit"></td>
-      <td>0.31</td>
-      <td>Migration generation and schema push</td>
-    </tr>
-    <tr>
-      <td>Authentication</td>
-      <td><img src="https://img.shields.io/badge/Custom_Auth-000000?style=flat" alt="Custom Auth"></td>
-      <td>--</td>
-      <td>Server actions with bcryptjs password hashing</td>
-    </tr>
-    <tr>
-      <td>Auth Integration</td>
-      <td><img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat&logo=nextdotjs&logoColor=white" alt="NextAuth"></td>
-      <td>5.0-beta</td>
-      <td>Available for OAuth/social login expansion</td>
-    </tr>
-  </tbody>
-</table>
-
-### Maps, Visualization, and Reporting
-
-<table width="100%">
-  <thead>
-    <tr>
-      <th width="15%" align="left">Layer</th>
-      <th width="25%" align="left">Technology</th>
-      <th width="15%" align="left">Version</th>
-      <th width="45%" align="left">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Maps</td>
-      <td><img src="https://img.shields.io/badge/Leaflet-199900?style=flat&logo=leaflet&logoColor=white" alt="Leaflet"></td>
-      <td>1.9 / 5.0</td>
-      <td>Interactive geospatial map and collaboration overlays</td>
-    </tr>
-    <tr>
-      <td>Charts</td>
-      <td><img src="https://img.shields.io/badge/Recharts-22B5BF?style=flat" alt="Recharts"></td>
-      <td>3.8</td>
-      <td>Admin dashboard analytics visualizations</td>
-    </tr>
-    <tr>
-      <td>PDF Export</td>
-      <td><img src="https://img.shields.io/badge/jsPDF-FF0000?style=flat" alt="jsPDF"></td>
-      <td>4.2 / 5.0</td>
-      <td>Server-side and client-side report generation</td>
-    </tr>
-    <tr>
-      <td>Geospatial Data</td>
-      <td><img src="https://img.shields.io/badge/GeoJSON-333333?style=flat" alt="GeoJSON"></td>
-      <td>--</td>
-      <td>Regional boundary rendering on the collaboration map</td>
-    </tr>
-  </tbody>
-</table>
-
-### File Storage
-
-<table width="100%">
-  <thead>
-    <tr>
-      <th width="15%" align="left">Layer</th>
-      <th width="25%" align="left">Technology</th>
-      <th width="15%" align="left">Version</th>
-      <th width="45%" align="left">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Document Storage</td>
-      <td><img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white" alt="PostgreSQL"></td>
-      <td>--</td>
-      <td>Binary document storage for current uploads</td>
-    </tr>
-    <tr>
-      <td>Blob Storage</td>
-      <td><img src="https://img.shields.io/badge/Vercel_Blob-000000?style=flat&logo=vercel&logoColor=white" alt="Vercel Blob"></td>
-      <td>2.3</td>
-      <td>Available for large file offloading</td>
-    </tr>
-  </tbody>
-</table>
-
-### Tooling and Quality
-
-<table width="100%">
-  <thead>
-    <tr>
-      <th width="15%" align="left">Layer</th>
-      <th width="25%" align="left">Technology</th>
-      <th width="15%" align="left">Version</th>
-      <th width="45%" align="left">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Linter</td>
-      <td><img src="https://img.shields.io/badge/ESLint-4B32C3?style=flat&logo=eslint&logoColor=white" alt="ESLint"></td>
-      <td>9.x</td>
-      <td>Static analysis and Next.js-specific rules</td>
-    </tr>
-    <tr>
-      <td>Type Checker</td>
-      <td><img src="https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white" alt="TypeScript"></td>
-      <td>5.x</td>
-      <td>Pre-build type validation</td>
-    </tr>
-    <tr>
-      <td>CI Pipeline</td>
-      <td><img src="https://img.shields.io/badge/NPM-CB3837?style=flat&logo=npm&logoColor=white" alt="NPM"></td>
-      <td>--</td>
-      <td>Lint, typecheck, and build in a single command</td>
-    </tr>
-  </tbody>
-</table>
 
 ---
 
