@@ -24,6 +24,8 @@ import {
   RESOURCE_SUBJECT_AREAS,
   RESOURCE_TYPES,
 } from '@/lib/constants';
+import { generateTextEmbedding } from '@/lib/ai';
+import { PDFParse } from 'pdf-parse';
 
 const MAX_TOPIC_TITLE = 160;
 const MAX_TOPIC_CONTENT = 6000;
@@ -313,6 +315,21 @@ export async function uploadDocumentAction(_state: CommunityActionState, formDat
   }
 
   const fileData = Buffer.from(await document.arrayBuffer());
+  let embedding: number[] | undefined = undefined;
+
+  try {
+    if (mimeType === 'application/pdf') {
+      const parser = new PDFParse({ data: fileData });
+      const parsed = await parser.getText();
+      const textForEmbedding = [title, description, parsed.text].filter(Boolean).join('\n\n').slice(0, 8000); 
+      embedding = await generateTextEmbedding(textForEmbedding);
+    } else {
+      const textForEmbedding = [title, description, keywords.join(' ')].filter(Boolean).join('\n\n'); 
+      embedding = await generateTextEmbedding(textForEmbedding);
+    }
+  } catch (error) {
+    console.warn("Failed to generate embedding for upload:", error);
+  }
 
   try {
     const resourceId = await createResourceUpload({
@@ -328,6 +345,7 @@ export async function uploadDocumentAction(_state: CommunityActionState, formDat
       fileSize: document.size,
       fileData,
       authorId: user.id,
+      embedding,
     });
 
     if (resourceId) {

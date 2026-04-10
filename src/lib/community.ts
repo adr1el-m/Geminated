@@ -9,6 +9,9 @@ export async function ensureModerationSchema() {
   if (!moderationSchemaReady) {
     moderationSchemaReady = (async () => {
       await db`
+        create extension if not exists vector
+      `;
+      await db`
         alter table forum_posts
         add column if not exists moderation_status text not null default 'pending'
       `;
@@ -40,6 +43,10 @@ export async function ensureModerationSchema() {
       await db`
         alter table resources
         add column if not exists moderated_at timestamptz
+      `;
+      await db`
+        alter table resources
+        add column if not exists embedding vector(768)
       `;
 
       await db`
@@ -123,6 +130,18 @@ export async function ensureModerationSchema() {
         alter table resources
         add column if not exists keywords text[] not null default '{}'::text[]
       `;
+      await db`
+        create table if not exists ai_field_alerts (
+          id uuid primary key default gen_random_uuid(),
+          region text not null,
+          cluster_title text not null,
+          sentiment text not null, 
+          affected_count integer not null,
+          description text not null,
+          suggested_intervention text not null,
+          created_at timestamptz default timezone('utc'::text, now())
+        )
+      `;
     })().catch((error) => {
       moderationSchemaReady = null;
       throw error;
@@ -162,6 +181,17 @@ export type ResourceUpload = {
   moderation_status: ModerationStatus;
   author_id: string;
   author_name: string;
+  created_at: string;
+};
+
+export type AiFieldAlert = {
+  id: string;
+  region: string;
+  cluster_title: string;
+  sentiment: string;
+  affected_count: number;
+  description: string;
+  suggested_intervention: string;
   created_at: string;
 };
 
@@ -601,6 +631,7 @@ export async function createResourceUpload(input: {
   fileSize: number;
   fileData: Buffer;
   authorId: string;
+  embedding?: number[];
 }) {
   await ensureModerationSchema();
 
@@ -637,6 +668,14 @@ export async function createResourceUpload(input: {
     )
     returning id
   `) as { id: string }[];
+
+  if (input.embedding && rows[0]?.id) {
+    await db`
+      update resources
+      set embedding = ${JSON.stringify(input.embedding)}::vector
+      where id = ${rows[0].id}
+    `;
+  }
 
   return rows[0]?.id;
 }
@@ -788,4 +827,12 @@ export async function deleteForumCommentById(id: string) {
   `) as RemovedForumCommentResult[];
 
   return rows[0] ?? null;
+}
+
+export async function getAiFieldAlerts() {
+  await ensureModerationSchema();
+  return (await db`
+    select * from ai_field_alerts
+    order by created_at desc
+  `) as AiFieldAlert[];
 }

@@ -10,6 +10,7 @@ import {
   RESOURCE_SUBJECT_AREAS,
 } from '@/lib/constants';
 import { formatDateTimeNoSeconds } from '@/lib/date-format';
+import AIRepositorySearch from '@/components/AIRepositorySearch';
 
 type PageProps = {
   searchParams: Promise<{ uploaded?: string; removedResource?: string; region?: string; subject?: string; q?: string }>;
@@ -75,6 +76,8 @@ export default async function RepositoryPage({ searchParams }: PageProps) {
           + Upload Document
         </a>
       </div>
+
+      <AIRepositorySearch />
 
       <form className={repoStyles.filterBar} method="get">
         <select className={repoStyles.filterSelect} name="region" defaultValue={selectedRegion}>

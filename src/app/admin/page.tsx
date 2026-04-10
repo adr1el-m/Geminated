@@ -15,6 +15,7 @@ import { getTrainingGapsByRegion } from '@/lib/training-records';
 import { getAllFeedbackSummaries } from '@/lib/program-feedback';
 import { BulkImportTabContent } from './BulkImportTabContent';
 import { DeliveryTabContent } from './DeliveryTabContent';
+import AIFieldInsightsTab from '@/components/AIFieldInsightsTab';
 import {
   approveResourceAction,
   rejectResourceAction,
@@ -41,7 +42,8 @@ type AdminTabId =
   | 'bulk-import'
   | 'delivery'
   | 'feedback'
-  | 'training-gaps';
+  | 'training-gaps'
+  | 'nlp-insights';
 
 export default async function AdminPage({ searchParams }: PageProps) {
   const user = await getCurrentUser();
@@ -59,7 +61,9 @@ export default async function AdminPage({ searchParams }: PageProps) {
   }
 
   const { moderated, tab } = await searchParams;
-  const [pendingResources, pendingTopics, insights, auditLogs, notifications, unreadNotifications, deliveries, trainingGaps, feedbackSummaries] = await Promise.all([
+  const { getAiFieldAlerts } = await import('@/lib/community');
+
+  const [pendingResources, pendingTopics, insights, auditLogs, notifications, unreadNotifications, deliveries, trainingGaps, feedbackSummaries, aiFieldAlerts] = await Promise.all([
     getPendingResources(),
     getPendingForumTopics(),
     getRegionalInsightsDashboard(),
@@ -69,6 +73,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
     getProgramDeliveries(),
     getTrainingGapsByRegion(),
     getAllFeedbackSummaries(),
+    getAiFieldAlerts(),
   ]);
 
   const needsByRegion = new Map(insights.needsSegmentation.map((item) => [item.region, item]));
@@ -90,6 +95,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
     { id: 'delivery', label: `Program Delivery (${deliveries.length})` },
     { id: 'feedback', label: `Feedback (${feedbackSummaries.length})` },
     { id: 'training-gaps', label: 'Training Gaps' },
+    { id: 'nlp-insights', label: '✨ AI Field Insights' },
   ];
 
   const activeTab = tabs.some((item) => item.id === tab) ? (tab as AdminTabId) : 'regional';
@@ -636,6 +642,18 @@ export default async function AdminPage({ searchParams }: PageProps) {
           )}
         </section>
       ) : null}
+
+      {activeTab === 'nlp-insights' ? (
+        <section className={adminStyles.section}>
+          <h2 className={adminStyles.sectionTitle}>AI-Driven Field Insights & Pedagogical Gaps</h2>
+          <p className={adminStyles.meta} style={{ marginBottom: '1.25rem' }}>
+            This system uses Large Language Models (LLM) to perform thematic clustering on community discourse.
+            Detect regional "pain points" automatically without manual moderation.
+          </p>
+          <AIFieldInsightsTab initialAlerts={aiFieldAlerts} />
+        </section>
+      ) : null}
     </div>
   );
 }
+
