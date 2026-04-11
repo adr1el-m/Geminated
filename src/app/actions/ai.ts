@@ -32,7 +32,7 @@ export async function askAiAction(query: string) {
   }
 }
 
-export async function runForumDiagnosticsAction() {
+export async function runForumDiagnosticsAction(_formData: FormData) {
   const user = await getCurrentUser();
   if (!user || user.role !== 'admin') {
     return { error: 'Unauthorized' };
