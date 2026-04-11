@@ -13,6 +13,8 @@
   ![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)
 </div>
 
+**Live Demo:** [https://geminated-star-link.vercel.app/](https://geminated-star-link.vercel.app/)
+
 ---
 
 ## Table of Contents
@@ -22,15 +24,16 @@
 3. [Interactive Intelligence Flow](#interactive-intelligence-flow)
 4. [Repository Structure](#repository-structure)
 5. [Core Features](#core-features)
-6. [Getting Started](#getting-started)
-7. [Environment Variables](#environment-variables)
-8. [Available Scripts](#available-scripts)
-9. [UI/UX Design Direction](#uiux-design-direction)
-10. [Security Hardening](#security-hardening)
-11. [Production Readiness](#production-readiness)
-12. [Success Metrics](#success-metrics)
-13. [Delivery Phases](#delivery-phases)
-14. [Team](#team)
+6. [Screenshots](#screenshots)
+7. [Getting Started](#getting-started)
+8. [Environment Variables](#environment-variables)
+9. [Available Scripts](#available-scripts)
+10. [UI/UX Design Direction](#uiux-design-direction)
+11. [Security Hardening](#security-hardening)
+12. [Production Readiness](#production-readiness)
+13. [Success Metrics](#success-metrics)
+14. [Delivery Phases](#delivery-phases)
+15. [Team](#team)
 
 ---
 
@@ -285,6 +288,82 @@ Geminated/
 - Regional comparison charts and trend analysis
 - Exportable PDF reports for annual planning and resource allocation
 - Bulk import for educator data via CSV
+
+---
+
+## Screenshots
+
+### 1. Landing Page
+
+![Landing Page](public/img/screenshots/LandingPage.png)
+
+Main entry screen that introduces STAR-LINK and guides educators into the platform.
+
+### 2. Teacher Registration
+
+![Teacher Registration](public/img/screenshots/TeacherRegistration.png)
+
+Registration flow where educators provide profile and institutional information.
+
+### 3. Teacher Login (Teacher Access)
+
+![Teacher Login](public/img/screenshots/TeacherLoginPage%28TeacherAccess%29.png)
+
+Secure sign-in interface for returning teachers and administrators.
+
+### 4. Teacher Profile
+
+![Teacher Profile](public/img/screenshots/TeacherProfile.png)
+
+Personal profile page showing educator details, credentials, and participation context.
+
+### 5. STAR Programs
+
+![STAR Programs](public/img/screenshots/STARPrograms.png)
+
+Program listing view for available STAR initiatives and related activities.
+
+### 6. Research and Extension Projects
+
+![Research and Extension Projects](public/img/screenshots/ResearchExtensionProjects.png)
+
+Repository page for browsing and sharing action research and extension outputs.
+
+### 7. Regional Discussion Forums
+
+![Regional Discussion Forums](public/img/screenshots/RegionalDiscussionForums.png)
+
+Community forum space where teachers exchange field experiences and strategies.
+
+### 8. Regional Teacher Profile Map
+
+![Regional Teacher Profile Map](public/img/screenshots/RegionalTeacherProfileMap.png)
+
+Map-based visualization of educator presence and regional collaboration patterns.
+
+### 9. Scholarly Synthesis and Pedagogical Guidance
+
+![Scholarly Synthesis and Pedagogical Guidance](public/img/screenshots/Scholarly%20SynthesisPedagogicalGuidance.png)
+
+AI-assisted synthesis panel that returns evidence-grounded teaching guidance.
+
+### 10. Admin Dashboard
+
+![Admin Dashboard](public/img/screenshots/AdminDashboard.png)
+
+Administrative analytics and moderation hub for oversight and planning decisions.
+
+### 11. Admin Profile
+
+![Admin Profile](public/img/screenshots/AdminProfile.png)
+
+Administrator profile and account management screen.
+
+### 12. AI Field Diagnostics
+
+![AI Field Diagnostics](public/img/screenshots/AIFieldDiagnostics.png)
+
+AI diagnostics view highlighting regional clusters, signals, and suggested interventions.
 
 ---
 
