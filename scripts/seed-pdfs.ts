@@ -4,7 +4,6 @@ import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { Pool } from '@neondatabase/serverless';
 import { jsPDF } from 'jspdf';
-import { GoogleGenAI } from '@google/genai';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,13 +28,21 @@ if (!connectionString) {
   throw new Error('DATABASE_URL is missing from .env.local.');
 }
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey || apiKey.includes('your_gemini_api_key_here')) {
-  console.log("No valid GEMINI_API_KEY found, seeding with default zero embeddings (Semantic search will not be highly accurate without real embeddings).");
-}
-
 const pool = new Pool({ connectionString });
-const ai = apiKey && !apiKey.includes('your_gemini_api_key') ? new GoogleGenAI({ apiKey }) : null;
+
+function buildDeterministicEmbedding(text: string, dimensions = 768): number[] {
+  const vector = new Array(dimensions).fill(0);
+
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    const idx = (code + i * 31) % dimensions;
+    const weight = ((code % 17) - 8) / 8;
+    vector[idx] += weight;
+  }
+
+  const norm = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0)) || 1;
+  return vector.map((value) => Number((value / norm).toFixed(6)));
+}
 
 // 2. Mock Data Pools
 const TOTAL_PDFS = 100;
@@ -63,7 +70,7 @@ const GRADES = ["Grade 7", "Grade 8", "Grade 9", "Grade 10", "Senior High", "Mul
 const SUBJECTS = ["Physics", "Chemistry", "Biology", "Mathematics", "Earth Science", "General Science"];
 
 async function run() {
-  console.log("Starting PDF generation and embedding seeding...");
+  console.log("Starting PDF generation and local embedding seeding...");
 
   // Get some valid teacher IDs
   const authorRes = await pool.query("SELECT id FROM profiles WHERE role = 'teacher' LIMIT 20");
@@ -101,23 +108,9 @@ async function run() {
     
     const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
 
-    // Generate AI Embedding
+    // Generate deterministic local embedding
     const textForEmbedding = `${title}\n\n${description}\n\n${keywordsStr}`;
-    let embeddingValues = new Array(768).fill(0); // fallback
-
-    if (ai) {
-      try {
-        const response = await ai.models.embedContent({
-          model: 'text-embedding-004',
-          contents: textForEmbedding,
-        });
-        if (response.embeddings && response.embeddings.length > 0) {
-          embeddingValues = response.embeddings[0].values || new Array(768).fill(0);
-        }
-      } catch(err: any) {
-        console.error(`Gemini embedding failed for [${i}]:`, err.message);
-      }
-    }
+    const embeddingValues = buildDeterministicEmbedding(textForEmbedding);
 
     const embeddingStr = `[${embeddingValues.join(',')}]`;
     const fileName = `${title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
@@ -140,9 +133,6 @@ async function run() {
     );
 
     console.log(`[${i}/${TOTAL_PDFS}] Successfully seeded: ${title}`);
-    
-    // 200ms delay to respect rate limits (if calling API)
-    if (ai) await new Promise(r => setTimeout(r, 200));
   }
 
   console.log("Completed seeding 100 mock PDFs!");

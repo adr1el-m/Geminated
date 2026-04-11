@@ -152,15 +152,7 @@
   background:
     radial-gradient(circle at 20% 25%, rgba(19, 92, 174, 0.2), transparent 45%),
     radial-gradient(circle at 78% 80%, rgba(22, 163, 74, 0.16), transparent 48%),
-    var(--surface);
-  box-shadow: inset 0 0 40px rgba(0,0,0,0.05);
-}
-
-[data-theme="dark"] .mapSkeleton {
-  background:
-    radial-gradient(circle at 20% 25%, rgba(111, 143, 192, 0.15), transparent 45%),
-    radial-gradient(circle at 78% 80%, rgba(111, 143, 192, 0.1), transparent 48%),
-    var(--surface);
+    linear-gradient(140deg, rgba(226, 236, 248, 0.8), rgba(243, 247, 255, 0.95));
 }
 
 .skeletonShimmer {
@@ -176,14 +168,14 @@
   z-index: 1;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  color: #1f3f69;
 }
 
 .skeletonHint {
   position: relative;
   z-index: 1;
   font-size: 0.9rem;
-  color: var(--text-muted);
+  color: #425d81;
 }
 
 @keyframes mapShimmer {
@@ -347,16 +339,9 @@
 
 .regionPopup :global(.leaflet-popup-content-wrapper) {
   border-radius: 0.85rem;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--foreground);
-  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(33, 74, 118, 0.2);
+  box-shadow: 0 12px 24px rgba(12, 36, 72, 0.2);
   max-width: min(300px, 84vw);
-}
-
-.regionPopup :global(.leaflet-popup-tip) {
-  background: var(--surface);
-  border: 1px solid var(--border);
 }
 
 .regionPopup :global(.leaflet-popup-content) {
@@ -372,20 +357,18 @@
 .popupTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  color: #1b3f67;
   margin-bottom: 0.45rem;
 }
 
 .popupMetric {
   font-size: 0.85rem;
-  color: var(--foreground);
-  opacity: 0.85;
+  color: #2f4769;
   margin-bottom: 0.2rem;
 }
 
 .popupMetric strong {
-  color: var(--foreground);
-  opacity: 1;
+  color: #1f3550;
 }
 
 .popupTag {
@@ -406,14 +389,14 @@
 }
 
 .regionLabel {
-  background: var(--surface);
-  color: var(--foreground);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+  color: #1f3550;
+  border: 1px solid rgba(33, 74, 118, 0.35);
   border-radius: 0.4rem;
   padding: 0.08rem 0.33rem;
   font-size: 0.66rem;
   font-weight: 700;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   pointer-events: none;
 }
 

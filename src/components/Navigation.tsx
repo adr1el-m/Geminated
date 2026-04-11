@@ -18,18 +18,6 @@ export default function Navigation({ currentUser }: NavigationProps) {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
-  // Scroll lock when menu is open
-  React.useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMenuOpen]);
-
   return (
     <header className={layoutStyles.header}>
       <div className={layoutStyles.container}>

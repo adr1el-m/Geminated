@@ -104,6 +104,11 @@
   margin: 1.1rem 0 0.75rem;
 }
 
+[data-theme="dark"] .sectionTitle,
+[data-theme="dark"] .subSectionTitle {
+  color: #c7dcff;
+}
+
 .queue {
   display: grid;
   gap: 1rem;

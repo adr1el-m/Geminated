@@ -1,4 +1,4 @@
-import { db } from './src/lib/db';
+import { db } from '../src/lib/db';
 
 async function check() {
   const posts = await db`select id, title, region, moderation_status from forum_posts`;

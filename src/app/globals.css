@@ -3,9 +3,7 @@
 :root {
   /* Default: Light Mode */
   --background: #ffffff;
-  --background-rgb: 255, 255, 255;
   --foreground: #000000;
-  --foreground-rgb: 0, 0, 0;
   
   --primary-blue: #1d4f91;
   --primary-blue-hover: #163f74;
@@ -19,8 +17,8 @@
   --text-muted: #475569;
   
   --radius-sm: 0.5rem;
-  --radius-md: 0.85rem;
-  --radius-lg: 1.25rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
   
   --shadow-sm: 0 2px 4px rgba(63, 68, 140, 0.03);
   --shadow-md: 0 8px 16px rgba(63, 68, 140, 0.06);
@@ -29,9 +27,7 @@
 
 [data-theme="dark"] {
   --background: #090e17;
-  --background-rgb: 9, 14, 23;
   --foreground: #f1f5f9;
-  --foreground-rgb: 241, 245, 249;
   
   --primary-blue: #6f8fc0; 
   --primary-blue-hover: #8ca8d2;
@@ -180,13 +176,13 @@ input[type="file"],
 select,
 textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.65rem 0.85rem;
   font-size: 0.95rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background-color: var(--surface);
   color: var(--foreground);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   appearance: none;
 }
 
@@ -204,6 +200,62 @@ select {
 
 [data-theme="dark"] select {
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f1f5f9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
+
+select option {
+  background-color: var(--surface);
+  color: var(--foreground);
+}
+
+/* Scrollbar styling */
+html,
+body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(63, 68, 140, 0.35) rgba(63, 68, 140, 0.12);
+}
+
+[data-theme="dark"] html,
+[data-theme="dark"] body,
+[data-theme="dark"] * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) rgba(15, 23, 42, 0.55);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(63, 68, 140, 0.08);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(63, 68, 140, 0.35);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(63, 68, 140, 0.55);
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border: 2px solid rgba(15, 23, 42, 0.6);
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.65);
 }
 
 input:focus,
@@ -335,8 +387,7 @@ button {
 
 @media (max-width: 480px) {
   .btn {
-    white-space: nowrap;
+    white-space: normal;
     text-align: center;
-    width: 100%;
   }
 }

@@ -27,7 +27,7 @@ export default function AIFieldInsightsTab({ initialAlerts }: Props) {
           setAlerts(result.alerts);
         }
       }
-    } catch (err) {
+    } catch {
       setMessage('Failed to trigger AI scan.');
     } finally {
       setLoading(false);
@@ -36,7 +36,7 @@ export default function AIFieldInsightsTab({ initialAlerts }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: '4px solid var(--primary-blue)' }}>
+      <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h3 style={{ margin: '0 0 0.25rem 0' }}>Proactive Field Diagnostics</h3>
           <p className={adminStyles.meta} style={{ margin: 0 }}>
@@ -70,7 +70,7 @@ export default function AIFieldInsightsTab({ initialAlerts }: Props) {
           </div>
         ) : (
           alerts.map((insight) => (
-            <article key={insight.id} className="card" style={{ borderLeft: `5px solid ${getSentimentColor(insight.sentiment)}` }}>
+            <article key={insight.id} className="card" style={{ border: '1px solid var(--border)' }}>
               <div className={adminStyles.itemHeader}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <span style={{ 
@@ -99,8 +99,8 @@ export default function AIFieldInsightsTab({ initialAlerts }: Props) {
                 </div>
                 
                 <div style={{ padding: '1rem', backgroundColor: 'var(--bg-color)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                  <h4 style={{ fontSize: '0.85rem', color: 'var(--primary-blue)', marginBottom: '0.5rem', fontWeight: 'bold' }}>🤖 AI Suggested Intervention</h4>
-                  <p style={{ fontSize: '0.9rem', color: 'var(--text-color)', margin: 0, lineHeight: '1.4' }}>
+                  <h4 style={{ fontSize: '0.85rem', color: 'var(--primary-blue)', marginBottom: '0.5rem', fontWeight: 'bold' }}>Recommended Intervention Plan</h4>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-color)', margin: 0, lineHeight: '1.5', whiteSpace: 'pre-line' }}>
                     {insight.suggested_intervention}
                   </p>
                 </div>

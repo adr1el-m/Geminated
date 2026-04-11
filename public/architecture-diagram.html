@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAR-LINK Architecture Diagram</title>
+    <style>
+        :root {
+            --bg-color: #090e17;
+            --primary-blue: #1d4f91;
+            --institutional-blue: #3F448C;
+            --accent-green: #22c55e;
+            --text-color: #f1f5f9;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            background-color: var(--bg-color);
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .diagram-container {
+            width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            position: relative;
+        }
+
+        .layer {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .layer-header {
+            position: absolute;
+            left: -140px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 120px;
+            color: var(--primary-blue);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-align: right;
+        }
+
+        .nodes {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .node {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover {
+            border-color: var(--primary-blue);
+            background: rgba(29, 79, 145, 0.1);
+        }
+
+        .node-icon {
+            width: 32px;
+            height: 32px;
+            fill: #fff;
+        }
+
+        .node-label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .node-sublabel {
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        /* Connecting Lines (SVG) */
+        .connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .glow-line {
+            stroke: var(--primary-blue);
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 5;
+            animation: flow 20s linear infinite;
+            filter: drop-shadow(0 0 4px var(--primary-blue));
+            opacity: 0.3;
+        }
+
+        @keyframes flow {
+            to { stroke-dashoffset: -100; }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 32px;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #fff, var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ai-node {
+            border-color: var(--accent-green) !important;
+            background: rgba(34, 197, 94, 0.05) !important;
+        }
+
+        .ai-node:hover {
+            background: rgba(34, 197, 94, 0.15) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="diagram-container">
+        <h1>STAR-LINK SYSTEM ARCHITECTURE</h1>
+
+        <!-- LAYER 1: CLIENT -->
+        <div class="layer">
+            <div class="layer-header">Client Layer</div>
+            <div class="nodes">
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <div class="node-label">Next.js 16</div>
+                    <div class="node-sublabel">App Router / React 19</div>
+                </div>
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <div class="node-label">Leaflet.js</div>
+                    <div class="node-sublabel">Geospatial Maps</div>
+                </div>
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    <div class="node-label">Recharts</div>
+                    <div class="node-sublabel">Analytics Engine</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LAYER 2: SECURITY -->
+        <div class="layer">
+            <div class="layer-header">Security Layer</div>
+            <div class="nodes">
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <div class="node-label">Middleware</div>
+                    <div class="node-sublabel">Rate Limiter / CSRF</div>
+                </div>
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    <div class="node-label">Bcrypt.js</div>
+                    <div class="node-sublabel">Session Management</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LAYER 3: APPLICATION -->
+        <div class="layer">
+            <div class="layer-header">Application Layer</div>
+            <div class="nodes">
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    <div class="node-label">Server Actions</div>
+                    <div class="node-sublabel">Next.js Standalone</div>
+                </div>
+                <div class="node ai-node">
+                    <svg class="node-icon" style="fill: var(--accent-green)" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    <div class="node-label">RAG Synthesis</div>
+                    <div class="node-sublabel">Groq / Llama-3</div>
+                </div>
+                <div class="node ai-node">
+                    <svg class="node-icon" style="fill: var(--accent-green)" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <div class="node-label">Field Diagnostics</div>
+                    <div class="node-sublabel">Thematic Clustering</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LAYER 4: PERSISTENCE -->
+        <div class="layer">
+            <div class="layer-header">Persistence Layer</div>
+            <div class="nodes">
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                    <div class="node-label">Neon PostgreSQL</div>
+                    <div class="node-sublabel">Serverless Database</div>
+                </div>
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24"><path d="M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35"/></svg>
+                    <div class="node-label">pgvector</div>
+                    <div class="node-sublabel">Hybrid Vector Search</div>
+                </div>
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <div class="node-label">Drizzle ORM</div>
+                    <div class="node-sublabel">Type-safe SQL</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SVG FOR CONNECTING LINES -->
+        <svg class="connections" viewBox="0 0 1000 600">
+            <!-- These are coordinate-specific lines, normally I'd use JS to calculate 
+                 but for a static professional version, we use strategic path positioning -->
+            <path class="glow-line" d="M500,100 L500,140" />
+            <path class="glow-line" d="M500,225 L500,265" />
+            <path class="glow-line" d="M500,350 L500,390" />
+            
+            <path class="glow-line" d="M250,100 L250,140" />
+            <path class="glow-line" d="M750,100 L750,140" />
+            
+            <path class="glow-line" d="M250,350 L250,390" />
+            <path class="glow-line" d="M750,350 L750,390" />
+        </svg>
+
+    </div>
+
+</body>
+</html>

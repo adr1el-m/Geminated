@@ -52,7 +52,7 @@ export async function runForumDiagnosticsAction() {
       return { message: 'No forum posts to analyze yet.' };
     }
 
-    // 2. Run Gemini NLP analysis
+    // 2. Run AI NLP analysis
     const alerts = await analyzeForumSentiment(posts);
 
     // 3. Clear old alerts and save new ones

@@ -1,27 +1,21 @@
-import { GoogleGenAI } from "@google/genai";
 import postgres from 'postgres';
 import 'dotenv/config';
 
 // Initialize Neon client
 const db = postgres(process.env.DATABASE_URL, { ssl: 'require' });
 
-// Initialize Gemini client
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+function generateTextEmbedding(text, dimensions = 768) {
+  const vector = new Array(dimensions).fill(0);
 
-async function generateTextEmbedding(text) {
-  try {
-    const response = await ai.models.embedContent({
-      model: 'gemini-embedding-2-preview',
-      contents: text,
-      config: {
-        outputDimensionality: 768,
-      },
-    });
-    return response.embeddings?.[0]?.values || [];
-  } catch (error) {
-    console.error("Gemini Embedding Error:", error);
-    return null;
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    const idx = (code + i * 31) % dimensions;
+    const weight = ((code % 17) - 8) / 8;
+    vector[idx] += weight;
   }
+
+  const norm = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0)) || 1;
+  return vector.map((value) => Number((value / norm).toFixed(6)));
 }
 
 async function main() {
@@ -47,7 +41,7 @@ async function main() {
         .filter(Boolean)
         .join('\n\n');
 
-      const embedding = await generateTextEmbedding(textForEmbedding);
+      const embedding = generateTextEmbedding(textForEmbedding);
 
       if (embedding && embedding.length > 0) {
         await db`

@@ -77,8 +77,6 @@ export default async function RepositoryPage({ searchParams }: PageProps) {
         </a>
       </div>
 
-      <AIRepositorySearch />
-
       <form className={repoStyles.filterBar} method="get">
         <select className={repoStyles.filterSelect} name="region" defaultValue={selectedRegion}>
           <option value="">All Regions</option>
@@ -124,6 +122,8 @@ export default async function RepositoryPage({ searchParams }: PageProps) {
         </div>
       ) : null}
 
+      <AIRepositorySearch />
+
       <div className={repoStyles.grid}>
         {filteredResources.length === 0 ? (
           <div className="card">
@@ -132,7 +132,12 @@ export default async function RepositoryPage({ searchParams }: PageProps) {
           </div>
         ) : (
           filteredResources.map((project) => (
-            <div key={project.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div
+              key={project.id}
+              id={`resource-${project.id}`}
+              className="card"
+              style={{ display: 'flex', flexDirection: 'column', gap: '1rem', scrollMarginTop: '6.5rem' }}
+            >
               <div className={repoStyles.cardHeader}>
                 <span className={repoStyles.tag}>{project.resource_type}</span>
                 <span className={repoStyles.regionBadge}>{formatDateTimeNoSeconds(project.created_at)}</span>

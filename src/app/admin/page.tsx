@@ -15,13 +15,14 @@ import { getTrainingGapsByRegion } from '@/lib/training-records';
 import { getAllFeedbackSummaries } from '@/lib/program-feedback';
 import { BulkImportTabContent } from './BulkImportTabContent';
 import { DeliveryTabContent } from './DeliveryTabContent';
-import AIFieldInsightsTab from '@/components/AIFieldInsightsTab';
 import {
   approveResourceAction,
   rejectResourceAction,
   approveTopicAction,
   rejectTopicAction,
 } from '@/app/actions/community';
+import { getAiFieldAlerts } from '@/lib/ai-alerts';
+import { runForumDiagnosticsAction } from '@/app/actions/ai';
 
 type PageProps = {
   searchParams: Promise<{ moderated?: string; tab?: string }>;
@@ -42,8 +43,8 @@ type AdminTabId =
   | 'bulk-import'
   | 'delivery'
   | 'feedback'
-  | 'training-gaps'
-  | 'nlp-insights';
+  | 'ai-alerts'
+  | 'training-gaps';
 
 export default async function AdminPage({ searchParams }: PageProps) {
   const user = await getCurrentUser();
@@ -61,8 +62,6 @@ export default async function AdminPage({ searchParams }: PageProps) {
   }
 
   const { moderated, tab } = await searchParams;
-  const { getAiFieldAlerts } = await import('@/lib/community');
-
   const [pendingResources, pendingTopics, insights, auditLogs, notifications, unreadNotifications, deliveries, trainingGaps, feedbackSummaries, aiFieldAlerts] = await Promise.all([
     getPendingResources(),
     getPendingForumTopics(),
@@ -94,8 +93,8 @@ export default async function AdminPage({ searchParams }: PageProps) {
     { id: 'bulk-import', label: 'Bulk Teacher Import' },
     { id: 'delivery', label: `Program Delivery (${deliveries.length})` },
     { id: 'feedback', label: `Feedback (${feedbackSummaries.length})` },
+    { id: 'ai-alerts', label: `Diagnostic AI (${aiFieldAlerts.length})` },
     { id: 'training-gaps', label: 'Training Gaps' },
-    { id: 'nlp-insights', label: 'AI Field Insights' },
   ];
 
   const activeTab = tabs.some((item) => item.id === tab) ? (tab as AdminTabId) : 'regional';
@@ -616,7 +615,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
           <h2 className={adminStyles.sectionTitle}>Training Gap Analysis</h2>
           <p className={adminStyles.meta} style={{ marginBottom: '0.8rem' }}>
             Regions sorted by lowest training coverage. Teachers who have no structured training records
-            or no STAR-specific training are flagged for priority outreach.
+            or no STAR-SPECIFIC training are flagged for priority outreach.
           </p>
           {trainingGaps.length === 0 ? (
             <div className="card">
@@ -643,17 +642,63 @@ export default async function AdminPage({ searchParams }: PageProps) {
         </section>
       ) : null}
 
-      {activeTab === 'nlp-insights' ? (
+      {activeTab === 'ai-alerts' ? (
         <section className={adminStyles.section}>
-          <h2 className={adminStyles.sectionTitle}>AI-Driven Field Insights & Pedagogical Gaps</h2>
-          <p className={adminStyles.meta} style={{ marginBottom: '1.25rem' }}>
-            This system uses Large Language Models (LLM) to perform thematic clustering on community discourse.
-            Detect regional "pain points" automatically without manual moderation.
+          <div className={adminStyles.sectionHeaderInline}>
+            <h2 className={adminStyles.sectionTitle}>AI Field Diagnostics ({aiFieldAlerts.length})</h2>
+            <form action={runForumDiagnosticsAction}>
+              <button type="submit" className="btn btn-primary">Run Diagnostic Scan</button>
+            </form>
+          </div>
+          <p className={adminStyles.meta} style={{ marginBottom: '1rem' }}>
+            Analyzes the latest regional forum discourse to detect thematic clusters and identify emerging training needs.
+            Artificial Intelligence (NLP) generates structured intervention plans for critical alert clusters.
           </p>
-          <AIFieldInsightsTab initialAlerts={aiFieldAlerts} />
+          
+          {aiFieldAlerts.length === 0 ? (
+            <div className="card">
+              <p className={adminStyles.empty}>No field alerts detected yet. Ensure the regional forums have active community discourse and click "Run Diagnostic Scan" above.</p>
+            </div>
+          ) : (
+            <div className={adminStyles.queue}>
+              {aiFieldAlerts.map((alert: any) => (
+                <article key={alert.id} className="card">
+                  <div className={adminStyles.itemHeader}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <h3 style={{ margin: 0 }}>{alert.cluster_title}</h3>
+                      <span className={alert.sentiment === 'Critical' ? adminStyles.riskBadge : adminStyles.badge}>
+                        {alert.sentiment.toUpperCase()}
+                      </span>
+                    </div>
+                    <span className={adminStyles.metricBadge}>{alert.region}</span>
+                  </div>
+                  
+                  <p className={adminStyles.meta} style={{ marginBottom: '0.6rem' }}>
+                    <strong>Affected Teachers/Posts:</strong> {alert.affected_count}
+                  </p>
+                  
+                  <p className={adminStyles.description}>
+                    <strong>Issue Summary:</strong> {alert.description}
+                  </p>
+                  
+                  <div className={adminStyles.notice} style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(29, 79, 145, 0.05)' }}>
+                    <h4 style={{ marginTop: 0, marginBottom: '0.5rem', color: 'var(--institutional-blue)' }}>Proposed Intervention Blueprint</h4>
+                    <pre style={{ 
+                      whiteSpace: 'pre-wrap', 
+                      fontFamily: 'inherit', 
+                      fontSize: '0.85rem', 
+                      color: 'var(--text-muted)',
+                      margin: 0
+                    }}>
+                      {alert.suggested_intervention}
+                    </pre>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
       ) : null}
     </div>
   );
 }
-

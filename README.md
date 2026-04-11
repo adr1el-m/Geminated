@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/img/favicon.png" alt="STAR-LINK Logo" width="250">
+  <img src="public/img/favicon.png" alt="STAR-LINK Logo" width="100" height="100">
 
   # STAR-LINK
 
@@ -10,7 +10,6 @@
   ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
   ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
   ![Vercel](https://img.shields.io/badge/Vercel-Deploy-000000?style=for-the-badge&logo=vercel&logoColor=white)
-  [![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/adr1el-m/Geminated)
   ![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)
 </div>
 
@@ -19,20 +18,19 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Technical Architecture](#technical-architecture)
-3. [Tech Stack](#tech-stack)
+2. [Tech Stack](#tech-stack)
+3. [Interactive Intelligence Flow](#interactive-intelligence-flow)
 4. [Repository Structure](#repository-structure)
 5. [Core Features](#core-features)
-6. [Platform Screenshots](#platform-screenshots)
-7. [Getting Started](#getting-started)
-8. [Environment Variables](#environment-variables)
-9. [Available Scripts](#available-scripts)
-10. [UI/UX Design Direction](#uiux-design-direction)
-11. [Security Hardening](#security-hardening)
-12. [Production Readiness](#production-readiness)
-13. [Success Metrics](#success-metrics)
-14. [Delivery Phases](#delivery-phases)
-15. [Team](#team)
+6. [Getting Started](#getting-started)
+7. [Environment Variables](#environment-variables)
+8. [Available Scripts](#available-scripts)
+9. [UI/UX Design Direction](#uiux-design-direction)
+10. [Security Hardening](#security-hardening)
+11. [Production Readiness](#production-readiness)
+12. [Success Metrics](#success-metrics)
+13. [Delivery Phases](#delivery-phases)
+14. [Team](#team)
 
 ---
 
@@ -53,42 +51,99 @@ The goal is to transform isolated innovations into nationally shared assets for 
 
 ---
 
-## Technical Architecture
-
-<div align="center">
-  <img src="public/img/diagram.png" alt="STAR-LINK Architecture Diagram" width="100%">
-</div>
-
----
-
 ## Tech Stack
 
-### Unified Tech Stack
+### Core Framework
 
-| Category | Layer | Technology | Version | Purpose |
-|:---|:---|:---|:---|:---|
-| **Core Framework** | Framework | ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white) | 16.2 | Server-side rendering, routing, API routes |
-| | UI Library | ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) | 19.2 | Component-based user interface |
-| | Language | ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) | 5.x | Static type safety across the codebase |
-| | Styling | ![CSS Modules](https://img.shields.io/badge/CSS_Modules-1572B6?style=flat&logo=css3&logoColor=white) | -- | Scoped component styles with shared design tokens |
-| **Data & Auth** | Database | ![Neon Postgres](https://img.shields.io/badge/Neon_Postgres-00E599?style=flat&logo=postgresql&logoColor=white) | -- | Serverless managed relational data store |
-| | Query Layer | ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat&logo=drizzle&logoColor=black) | 0.45 | Type-safe SQL queries and schema management |
-| | Database Driver | ![Neon Serverless](https://img.shields.io/badge/Neon_Serverless-00E599?style=flat&logo=postgresql&logoColor=white) | 1.x | HTTP-based PostgreSQL driver for edge/serverless |
-| | Schema Tooling | ![Drizzle Kit](https://img.shields.io/badge/Drizzle_Kit-C5F74F?style=flat&logo=drizzle&logoColor=black) | 0.31 | Migration generation and schema push |
-| | Authentication | ![Custom Auth](https://img.shields.io/badge/Custom_Auth-000000?style=flat) | -- | Server actions with bcryptjs password hashing |
-| | Auth Integration | ![NextAuth](https://img.shields.io/badge/NextAuth.js-000000?style=flat&logo=nextdotjs&logoColor=white) | 5.0-beta | Available for OAuth/social login expansion |
-| **Maps & Reporting** | Maps | ![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=flat&logo=leaflet&logoColor=white) | 1.9 / 5.0 | Interactive geospatial map and collaboration overlays |
-| | Charts | ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?style=flat) | 3.8 | Admin dashboard analytics visualizations |
-| | PDF Export | ![jsPDF](https://img.shields.io/badge/jsPDF-FF0000?style=flat) | 4.2 / 5.0 | Server-side and client-side report generation |
-| | Geospatial Data | ![GeoJSON](https://img.shields.io/badge/GeoJSON-333333?style=flat) | -- | Regional boundary rendering on the collaboration map |
-| **File Storage** | Document Storage | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white) | -- | Binary document storage for current uploads |
-| | Blob Storage | ![Vercel Blob](https://img.shields.io/badge/Vercel_Blob-000000?style=flat&logo=vercel&logoColor=white) | 2.3 | Available for large file offloading |
-| **Tooling & Quality** | Linter | ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=flat&logo=eslint&logoColor=white) | 9.x | Static analysis and Next.js-specific rules |
-| | Type Checker | ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) | 5.x | Pre-build type validation |
-| | CI Pipeline | ![NPM](https://img.shields.io/badge/NPM-CB3837?style=flat&logo=npm&logoColor=white) | -- | Lint, typecheck, and build in a single command |
+| Layer | Technology | Version | Purpose |
+|:------|:-----------|:--------|:--------|
+| Framework | ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white) | 16.2 | Server-side rendering, routing, API routes |
+| UI Library | ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) | 19.2 | Component-based user interface |
+| Language | ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white) | 5.x | Static type safety across the codebase |
+| Styling | ![CSS Modules](https://img.shields.io/badge/CSS_Modules-1572B6?style=flat&logo=css3&logoColor=white) | -- | Scoped component styles with shared design tokens |
+
+### Data and Authentication
+
+| Layer | Technology | Version | Purpose |
+|:------|:-----------|:--------|:--------|
+| Database | ![Neon Postgres](https://img.shields.io/badge/Neon_Postgres-00E599?style=flat&logo=postgresql&logoColor=white) | -- | Serverless managed relational data store |
+| Query Layer | ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat&logo=drizzle&logoColor=black) | 0.45 | Type-safe SQL queries and schema management |
+| Database Driver | ![Neon Serverless](https://img.shields.io/badge/Neon_Serverless-00E599?style=flat&logo=postgresql&logoColor=white) | 1.x | HTTP-based PostgreSQL driver for edge/serverless |
+| Schema Tooling | ![Drizzle Kit](https://img.shields.io/badge/Drizzle_Kit-C5F74F?style=flat&logo=drizzle&logoColor=black) | 0.31 | Migration generation and schema push |
+| Authentication | ![Custom Auth](https://img.shields.io/badge/Custom_Auth-000000?style=flat) | -- | Server actions with bcryptjs password hashing |
+| Auth Integration | ![NextAuth](https://img.shields.io/badge/NextAuth.js-000000?style=flat&logo=nextdotjs&logoColor=white) | 5.0-beta | Available for OAuth/social login expansion |
+
+### Maps, Visualization, and Reporting
+
+| Layer | Technology | Version | Purpose |
+|:------|:-----------|:--------|:--------|
+| Maps | ![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=flat&logo=leaflet&logoColor=white) | 1.9 / 5.0 | Interactive geospatial map and collaboration overlays |
+| Charts | ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?style=flat) | 3.8 | Admin dashboard analytics visualizations |
+| PDF Export | ![jsPDF](https://img.shields.io/badge/jsPDF-FF0000?style=flat) | 4.2 / 5.0 | Server-side and client-side report generation |
+| Geospatial Data | ![GeoJSON](https://img.shields.io/badge/GeoJSON-333333?style=flat) | -- | Regional boundary rendering on the collaboration map |
+
+### File Storage
+
+| Layer | Technology | Version | Purpose |
+|:------|:-----------|:--------|:--------|
+| Document Storage | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white) | -- | Binary document storage for current uploads |
+| Blob Storage | ![Vercel Blob](https://img.shields.io/badge/Vercel_Blob-000000?style=flat&logo=vercel&logoColor=white) | 2.3 | Available for large file offloading |
+
+| CI Pipeline | ![NPM](https://img.shields.io/badge/NPM-CB3837?style=flat&logo=npm&logoColor=white) | -- | Lint, typecheck, and build in a single command |
+
+### Knowledge Intelligence (AI Layer)
+
+| Layer | Technology | Model | Purpose |
+|:------|:-----------|:------|:--------|
+| Inference Engine | ![Groq](https://img.shields.io/badge/Groq-f55036?style=flat) | Llama-3.1 / 3.3 | High-velocity LLM inference for RAG and NLP |
+| Synthesis Layer | ![RAG](https://img.shields.io/badge/RAG-000000?style=flat) | Custom | Context-grounded pedagogical answer synthesis |
+| Analysis Layer | ![NLP](https://img.shields.io/badge/NLP-000000?style=flat) | Custom | Thematic clustering of regional forum discourse |
+| Embedding Fallback | ![Lexical](https://img.shields.io/badge/Lexical_Search-000000?style=flat) | Heuristic | Rule-based fallback for high-availability diagnostics |
 
 
 ---
+
+## Interactive Intelligence Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Educator as STEM Educator
+    participant Platform as STAR-LINK Hub
+    participant AI as AI Intelligence (Groq)
+    participant DB as Neon DB (pgvector)
+
+    Note over Educator, DB: Scenario A: Knowledge Synthesis (RAG Flow)
+    Educator->>Platform: Submits Pedagogical Query
+    Platform->>DB: Vector Search (Similarity & Lexical)
+    DB-->>Platform: Returns relevant Research Citations
+    Platform->>AI: query + Research context
+    AI->>AI: Synthesizes evidence-based response
+    AI-->>Platform: Pedagogical Brief
+    Platform-->>Educator: Displays Brief with Author Citations
+
+    Note over Educator, DB: Scenario B: Field Diagnostics (Admin Flow)
+    actor Admin as DOST Administrator
+    Admin->>Platform: Triggers Diagnostic Scan
+    Platform->>DB: Fetch latest regional forum data
+    DB-->>Platform: Raw forum discourse
+    Platform->>AI: Analyze sentiment & cluster themes
+    AI->>AI: Generates Alert Clusters & Interventions
+    AI-->>Platform: Structured Intelligence Alerts
+    Platform->>DB: Persists Field Alerts
+    Platform-->>Admin: Updates Regional Health Map
+
+    Note over Educator, DB: Scenario C: Behavioral Twinning Matching
+    Admin->>Platform: Requests Twinning Recommendations
+    Platform->>DB: Aggregates school activity signals
+    DB-->>Platform: teacher_count + forum_activity
+    Platform->>Platform: AI-Powered Distance Scoring
+    Platform->>DB: Matches "Isolated" with "Mentor" schools
+    Platform-->>Admin: Displays Twinning Intervention Map
+```
+
+---
+
 
 ## Repository Structure
 
@@ -226,63 +281,6 @@ Geminated/
 - Regional comparison charts and trend analysis
 - Exportable PDF reports for annual planning and resource allocation
 - Bulk import for educator data via CSV
-
----
-
-## Platform Screenshots
-
-<table width="100%">
-  <tr>
-    <td width="50%">
-      <img src="public/img/screenshots/LandingPage.png" alt="Landing Page">
-      <br><b>Landing Page</b>: The welcoming gateway to the STAR-LINK community hub.
-    </td>
-    <td width="50%">
-      <img src="public/img/screenshots/TeacherRegistration.png" alt="Teacher Registration">
-      <br><b>Teacher Registration</b>: Dedicated sign-up flow ensuring authenticated STEM educators.
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <img src="public/img/screenshots/TeacherLoginPage(TeacherAccess).png" alt="Teacher Login Page">
-      <br><b>Teacher Login Page</b>: Secure entry point for educators to access their network.
-    </td>
-    <td width="50%">
-      <img src="public/img/screenshots/TeacherProfile.png" alt="Teacher Profile">
-      <br><b>Teacher Profile</b>: A detailed pedagogical profile displaying specializations and expertise.
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <img src="public/img/screenshots/ResearchExtensionProjects.png" alt="Research & Extension Projects">
-      <br><b>Research & Extension Projects</b>: The central repository for discovering and scaling classroom innovations.
-    </td>
-    <td width="50%">
-      <img src="public/img/screenshots/RegionalDiscussionForums.png" alt="Regional Discussion Forums">
-      <br><b>Regional Discussion Forums</b>: Interactive spaces for localized peer support and knowledge exchange.
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <img src="public/img/screenshots/RegionalTeacherProfileMap.png" alt="Regional Teacher Profile Map">
-      <br><b>Regional Teacher Profile Map</b>: An interactive geospatial tool visualizing collaboration density across provinces.
-    </td>
-    <td width="50%">
-      <img src="public/img/screenshots/STARPrograms.png" alt="STAR Programs">
-      <br><b>STAR Programs</b>: A dedicated module tracking participation and quality feedback for training initiatives.
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <img src="public/img/screenshots/AdminDashboard.png" alt="Admin Dashboard">
-      <br><b>Admin Dashboard</b>: A powerful command center for monitoring platform-wide behavior and metrics.
-    </td>
-    <td width="50%">
-      <img src="public/img/screenshots/AdminProfile.png" alt="Admin Profile">
-      <br><b>Admin Profile</b>: Management hub for overseeing regional coordinators and maintaining system health.
-    </td>
-  </tr>
-</table>
 
 ---
 
@@ -443,9 +441,6 @@ Configured via `next.config.ts`:
         <a href="https://www.linkedin.com/in/janel-rose-trongcoso-24467b23a/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
-        <a href="https://github.com/jrtrongcoso">
-          <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
-        </a>
       </td>
       <td align="center" style="border: 1px solid #30363d; width: 220px;">
         <img src="public/img/gem.jpeg" alt="Gem Christian Lazo" width="120" height="120" style="object-fit: cover;"><br>
@@ -453,18 +448,12 @@ Configured via `next.config.ts`:
         <a href="https://www.linkedin.com/in/gemchristianolazo/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
-        <a href="https://github.com/gemchristianolazo">
-          <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
-        </a>
       </td>
       <td align="center" style="border: 1px solid #30363d; width: 220px;">
         <img src="public/img/adriel.jpg" alt="Adriel Magalona" width="120" height="120" style="object-fit: cover;"><br>
         <strong>Adriel Magalona</strong><br>
         <a href="https://www.linkedin.com/in/adr1el/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
-        </a>
-        <a href="https://github.com/adr1el-m">
-          <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
         </a>
       </td>
     </tr>
@@ -478,18 +467,12 @@ Configured via `next.config.ts`:
         <a href="https://www.linkedin.com/in/marti-kier-trance-125371370/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
         </a>
-        <a href="https://github.com/KMarttt">
-          <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
-        </a>
       </td>
       <td align="center" style="border: 1px solid #30363d; width: 220px;">
         <img src="public/img/christine.jpeg" alt="Christine Rio" width="120" height="120" style="object-fit: cover;"><br>
         <strong>Christine Rio</strong><br>
         <a href="https://www.linkedin.com/in/riochristine/">
           <img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
-        </a>
-        <a href="https://github.com/riochristine">
-          <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
         </a>
       </td>
     </tr>
