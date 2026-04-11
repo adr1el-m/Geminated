@@ -297,7 +297,9 @@
 
 @media (max-width: 420px) {
   .title {
-    font-size: 2.15rem;
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
   }
 
   .sectionTitle {

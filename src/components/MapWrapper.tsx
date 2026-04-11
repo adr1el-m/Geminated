@@ -91,6 +91,26 @@ export default function MapWrapper({
   onRegionSelect,
 }: MapWrapperProps) {
   const [boundaryByRegion, setBoundaryByRegion] = useState<Record<string, LeafletPolygonPositions>>({});
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+          const newTheme = document.documentElement.getAttribute('data-theme') as 'light' | 'dark';
+          setTheme(newTheme || 'light');
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+    
+    // Initial check
+    const currentTheme = document.documentElement.getAttribute('data-theme') as 'light' | 'dark';
+    if (currentTheme) setTheme(currentTheme);
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     let isActive = true;
@@ -162,7 +182,10 @@ export default function MapWrapper({
     >
       <TileLayer
         attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        url={theme === 'dark' 
+          ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        }
         noWrap
       />
 

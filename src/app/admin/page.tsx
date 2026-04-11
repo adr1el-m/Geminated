@@ -95,7 +95,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
     { id: 'delivery', label: `Program Delivery (${deliveries.length})` },
     { id: 'feedback', label: `Feedback (${feedbackSummaries.length})` },
     { id: 'training-gaps', label: 'Training Gaps' },
-    { id: 'nlp-insights', label: '✨ AI Field Insights' },
+    { id: 'nlp-insights', label: 'AI Field Insights' },
   ];
 
   const activeTab = tabs.some((item) => item.id === tab) ? (tab as AdminTabId) : 'regional';

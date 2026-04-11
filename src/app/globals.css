@@ -3,7 +3,9 @@
 :root {
   /* Default: Light Mode */
   --background: #ffffff;
+  --background-rgb: 255, 255, 255;
   --foreground: #000000;
+  --foreground-rgb: 0, 0, 0;
   
   --primary-blue: #1d4f91;
   --primary-blue-hover: #163f74;
@@ -17,8 +19,8 @@
   --text-muted: #475569;
   
   --radius-sm: 0.5rem;
-  --radius-md: 1rem;
-  --radius-lg: 1.5rem;
+  --radius-md: 0.85rem;
+  --radius-lg: 1.25rem;
   
   --shadow-sm: 0 2px 4px rgba(63, 68, 140, 0.03);
   --shadow-md: 0 8px 16px rgba(63, 68, 140, 0.06);
@@ -27,7 +29,9 @@
 
 [data-theme="dark"] {
   --background: #090e17;
+  --background-rgb: 9, 14, 23;
   --foreground: #f1f5f9;
+  --foreground-rgb: 241, 245, 249;
   
   --primary-blue: #6f8fc0; 
   --primary-blue-hover: #8ca8d2;
@@ -176,13 +180,13 @@ input[type="file"],
 select,
 textarea {
   width: 100%;
-  padding: 0.65rem 0.85rem;
+  padding: 0.75rem 1rem;
   font-size: 0.95rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background-color: var(--surface);
   color: var(--foreground);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   appearance: none;
 }
 
@@ -331,7 +335,8 @@ button {
 
 @media (max-width: 480px) {
   .btn {
-    white-space: normal;
+    white-space: nowrap;
     text-align: center;
+    width: 100%;
   }
 }

@@ -49,7 +49,7 @@ export default function AIFieldInsightsTab({ initialAlerts }: Props) {
           className="btn btn-primary"
           style={{ height: 'fit-content', minWidth: '180px' }}
         >
-          {loading ? 'AI Analyzing...' : '✨ Run AI Field Scan'}
+          {loading ? 'AI Analyzing...' : 'Run AI Field Scan'}
         </button>
       </div>
 

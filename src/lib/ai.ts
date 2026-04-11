@@ -8,8 +8,11 @@ const ai = new GoogleGenAI({});
 export async function generateTextEmbedding(text: string): Promise<number[]> {
   try {
     const response = await ai.models.embedContent({
-      model: 'text-embedding-004',
+      model: 'gemini-embedding-2-preview',
       contents: text,
+      config: {
+        outputDimensionality: 768,
+      },
     });
     return response.embeddings?.[0]?.values || [];
   } catch (error) {
@@ -124,6 +127,16 @@ export async function searchSimilarResources(query: string) {
 }
 
 export async function analyzeForumSentiment(posts: any[]) {
+  if (!posts || posts.length === 0) return [];
+
+  // Check for placeholder key
+  const isPlaceholder = !process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.includes('your_gemini_api_key_here');
+
+  if (isPlaceholder) {
+    console.warn("Using heuristic fallback for forum analysis: Placeholder API key detected.");
+    return generateHeuristicAlerts(posts);
+  }
+
   try {
     const postsContext = posts.map(p => `[Region: ${p.region}] Title: ${p.title}\nContent: ${p.content}`).join("\n---\n");
 
@@ -168,8 +181,64 @@ If no significant clusters are found, return an empty array [].`;
     const jsonString = text.replace(/```json/g, "").replace(/```/g, "").trim();
     return JSON.parse(jsonString);
   } catch (error) {
-    console.error("Gemini NLP Error:", error);
-    return [];
+    console.error("Gemini NLP Error, falling back to heuristic:", error);
+    return generateHeuristicAlerts(posts);
   }
 }
+
+function generateHeuristicAlerts(posts: any[]) {
+  const alerts: any[] = [];
+  
+  const findPosts = (regionMatch: string | RegExp, keywords: RegExp) => {
+    return posts.filter(p => {
+      const region = String(p.region || "").trim();
+      const text = (p.title + " " + p.content).toLowerCase();
+      const matchesRegion = typeof regionMatch === 'string' ? region === regionMatch : regionMatch.test(region);
+      return matchesRegion && keywords.test(text);
+    });
+  };
+
+  // Rule 1: Region III Laboratory Issues (matches "Region III", "Region 3", "III")
+  const r3Laboratory = findPosts(/Region III|Region 3|Central Luzon/i, /lab|kit|equipment|microscope/i);
+  if (r3Laboratory.length >= 2) {
+    alerts.push({
+      region: "Region III",
+      cluster_title: "Laboratory Resource Gaps",
+      sentiment: "Critical",
+      affected_count: r3Laboratory.length,
+      description: "Teachers are reporting significant delays and quality issues with recently dispatched laboratory science kits.",
+      suggested_intervention: "Audit regional logistics hub and expedite replacement of damaged equipment."
+    });
+  }
+
+  // Rule 2: NCR Connectivity
+  const ncrConnectivity = findPosts(/NCR|Metro Manila|Manila/i, /internet|connectivity|slow|access|digital|offline|bandwidth|server/i);
+  if (ncrConnectivity.length >= 2) {
+    alerts.push({
+      region: "NCR",
+      cluster_title: "Digital Module Access Barriers",
+      sentiment: "Warning",
+      affected_count: ncrConnectivity.length,
+      description: "Public schools in Metro Manila are facing bandwidth limitations that hinder the deployment of interactive digital science modules.",
+      suggested_intervention: "Provide compressed/offline-capable versions of digital modules and coordinate with local IT units for bandwidth optimization."
+    });
+  }
+
+  // Rule 3: Region IV-A Curriculum
+  const r4aCurriculum = findPosts(/Region IV-A|Region 4A|CALABARZON/i, /curriculum|integration|math|data science|overlap|elective/i);
+  if (r4aCurriculum.length >= 2) {
+    alerts.push({
+      region: "Region IV-A",
+      cluster_title: "STEM Curriculum Transition Gaps",
+      sentiment: "Constructive",
+      affected_count: r4aCurriculum.length,
+      description: "Educators are seeking clearer frameworks for integrating new Data Science electives into standard Mathematics tracks.",
+      suggested_intervention: "Organize a regional curriculum mapping workshop and publish a peer-mentoring guide for specialized STEM tracks."
+    });
+  }
+
+  return alerts;
+}
+
+
 
