@@ -79,7 +79,7 @@ export async function loginAction(_state: AuthActionState, formData: FormData) {
   }
 
   if (toProfile) {
-    redirect('/profile');
+    redirect('/dashboard');
   } else {
     redirect('/hub');
   }

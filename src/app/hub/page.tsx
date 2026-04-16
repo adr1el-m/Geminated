@@ -10,7 +10,7 @@ export default async function HubPage() {
   }
 
   if (hasAcceptedLatestTerms(user)) {
-    redirect('/profile');
+    redirect('/dashboard');
   }
 
   return <TermsModal />;

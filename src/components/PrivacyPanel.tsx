@@ -183,7 +183,12 @@ export default function PrivacyPanel({
             disabled={exporting}
             style={{ fontSize: '0.9rem' }}
           >
-            {exporting ? 'Preparing Export...' : '📦 Export My Data'}
+            {exporting ? 'Preparing Export...' : (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 8zM4 19h16v2H4z"/></svg>
+                Export My Data
+              </span>
+            )}
           </button>
 
           {!isDeletionPending ? (
@@ -198,7 +203,10 @@ export default function PrivacyPanel({
                 border: '1px solid rgba(239, 68, 68, 0.2)',
               }}
             >
-              🗑 Request Account Deletion
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                Request Account Deletion
+              </span>
             </button>
           ) : null}
         </div>

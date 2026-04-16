@@ -48,7 +48,10 @@ export default function Navigation({ currentUser }: NavigationProps) {
           <Link href="/forum" className={layoutStyles.navLink} onClick={closeMenu}>Community Forums</Link>
           <Link href="/map" className={layoutStyles.navLink} onClick={closeMenu}>Regional Map</Link>
           {currentUser ? (
-            <Link href="/programs" className={layoutStyles.navLink} onClick={closeMenu}>Programs</Link>
+            <>
+              <Link href="/dashboard" className={layoutStyles.navLink} onClick={closeMenu}>Dashboard</Link>
+              <Link href="/programs" className={layoutStyles.navLink} onClick={closeMenu}>Programs</Link>
+            </>
           ) : null}
           {currentUser?.role === 'admin' ? (
             <Link href="/admin" className={layoutStyles.navLink} onClick={closeMenu}>Admin Dashboard</Link>

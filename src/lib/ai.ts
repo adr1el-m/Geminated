@@ -347,44 +347,28 @@ export async function synthesizeAiAnswer(query: string, contextDocuments: Reposi
     const prompt = `You are the STAR-LINK AI Assistant, a specialized academic support assistant for STEM educators in the Philippines.
 The user is asking: "${query}"
 
-Here are the retrieved Action Research and Extension resources from our database:
+Here are the top 5 most relevant Action Research and Extension resources from our database:
 ${documentsContext}
 
-## CRITICAL INSTRUCTIONS:
-1. STRICT ADHERENCE TO CONTEXT: You must ONLY synthesize information using the provided resources above. DO NOT invent, hallucinate, or bring in external knowledge not present in the context.
-2. EXPLICIT CITATIONS: You must connect every significant claim or recommendation to a source citation using bracket notation (e.g., "As demonstrated in [1]..." or "The study showed significant improvement [2]").
-3. HANDLE MISSING EVIDENCE: If the provided resources do NOT contain enough information to fully answer the user's question, you must explicitly state: "The current Action Research repository has limited evidence on this specific topic," and then synthesize whatever partial information is available.
+  Using ONLY the provided resources, produce a detailed, academically toned synthesis that is practical for classroom implementation.
+  Do not invent sources or claims that are not present in the provided context.
+  Explicitly connect claims to source citations using bracket notation like [1], [2], [3] corresponding to the listed resources.
+  If evidence is limited for any recommendation, state that limitation clearly.
 
-## REQUIRED RESPONSE STRUCTURE:
-Return a detailed markdown response using strictly this structure:
+  Return markdown using this structure:
+  ### Executive Summary
+  ### Contextual Interpretation for Philippine STEM Classrooms
+  ### Evidence-Based Instructional Strategies
+  - For each strategy: include rationale, implementation steps, and adaptation notes.
+  ### 2-Week Implementation Blueprint
+  ### Monitoring and Evaluation Indicators
+  ### Potential Risks and Mitigation
+  ### Cited Resources
 
-### Executive Summary
-[Brief 2-3 sentence overview of the findings based strictly on the provided context]
-
-### Contextual Interpretation for Philippine STEM Classrooms
-[How these findings apply locally, based on the context]
-
-### Evidence-Based Instructional Strategies
-[List strategies based on the sources. For each strategy include:]
-- **Rationale**: [Why it works]
-- **Implementation Steps**: [How to do it]
-- **Adaptation Notes**: [How to adapt for different resource levels]
-
-### 2-Week Implementation Blueprint
-[Step-by-step practical guide derived from the sources]
-
-### Monitoring and Evaluation Indicators
-[How teachers can measure success, based on the sources]
-
-### Potential Risks and Mitigation
-[Challenges identified in the sources and how to overcome them]
-
-### Cited Resources
-[List the resources used with their citation numbers]
-
-## TONE REQUIREMENTS:
-- Scholarly, purely evidence-based, clear, concise, and highly actionable.
-- Avoid generic motivational filler and vague advice.`;
+  Tone requirements:
+  - Scholarly, clear, and concise.
+  - Practical and implementation-ready.
+  - Avoid generic filler and vague advice.`;
 
     const response = await generateContentWithFallback(prompt);
     const generated = response.text?.trim();
