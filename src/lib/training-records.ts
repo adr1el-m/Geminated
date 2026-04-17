@@ -25,24 +25,35 @@ export type TrainingGapSummary = {
   starTrainingRate: number;
 };
 
+let trainingSchemaReady: Promise<void> | null = null;
+
 async function ensureTrainingSchema() {
-  await db`
-    create table if not exists training_records (
-      id uuid primary key default gen_random_uuid(),
-      teacher_id uuid not null references profiles(id) on delete cascade,
-      program_title text not null,
-      provider text not null default 'Self-reported',
-      training_date date,
-      duration_hours integer default null,
-      training_type text not null default 'External Workshop',
-      verified boolean not null default false,
-      created_at timestamptz not null default now()
-    )
-  `;
-  await db`
-    create index if not exists training_records_teacher_idx
-    on training_records(teacher_id, created_at desc)
-  `;
+  if (!trainingSchemaReady) {
+    trainingSchemaReady = (async () => {
+      await db`
+        create table if not exists training_records (
+          id uuid primary key default gen_random_uuid(),
+          teacher_id uuid not null references profiles(id) on delete cascade,
+          program_title text not null,
+          provider text not null default 'Self-reported',
+          training_date date,
+          duration_hours integer default null,
+          training_type text not null default 'External Workshop',
+          verified boolean not null default false,
+          created_at timestamptz not null default now()
+        )
+      `;
+      await db`
+        create index if not exists training_records_teacher_idx
+        on training_records(teacher_id, created_at desc)
+      `;
+    })().catch((error) => {
+      trainingSchemaReady = null;
+      throw error;
+    });
+  }
+
+  await trainingSchemaReady;
 }
 
 export async function getTrainingRecordsForTeacher(teacherId: string): Promise<TrainingRecord[]> {

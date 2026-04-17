@@ -30,30 +30,41 @@ export type ProgramDelivery = {
   created_at: string;
 };
 
+let deliverySchemaReady: Promise<void> | null = null;
+
 async function ensureDeliverySchema() {
-  await db`
-    create table if not exists program_deliveries (
-      id uuid primary key default gen_random_uuid(),
-      title text not null,
-      program_type text not null,
-      target_region text not null default 'National',
-      target_division text,
-      scheduled_date date not null,
-      status text not null default 'scheduled'
-        check (status in ('scheduled', 'ongoing', 'completed', 'cancelled')),
-      notes text,
-      created_by uuid references profiles(id) on delete set null,
-      created_at timestamptz not null default now()
-    )
-  `;
-  await db`
-    create index if not exists program_deliveries_region_idx
-    on program_deliveries(target_region, scheduled_date desc)
-  `;
-  await db`
-    create index if not exists program_deliveries_status_idx
-    on program_deliveries(status, scheduled_date desc)
-  `;
+  if (!deliverySchemaReady) {
+    deliverySchemaReady = (async () => {
+      await db`
+        create table if not exists program_deliveries (
+          id uuid primary key default gen_random_uuid(),
+          title text not null,
+          program_type text not null,
+          target_region text not null default 'National',
+          target_division text,
+          scheduled_date date not null,
+          status text not null default 'scheduled'
+            check (status in ('scheduled', 'ongoing', 'completed', 'cancelled')),
+          notes text,
+          created_by uuid references profiles(id) on delete set null,
+          created_at timestamptz not null default now()
+        )
+      `;
+      await db`
+        create index if not exists program_deliveries_region_idx
+        on program_deliveries(target_region, scheduled_date desc)
+      `;
+      await db`
+        create index if not exists program_deliveries_status_idx
+        on program_deliveries(status, scheduled_date desc)
+      `;
+    })().catch((error) => {
+      deliverySchemaReady = null;
+      throw error;
+    });
+  }
+
+  await deliverySchemaReady;
 }
 
 export async function getProgramDeliveries(filters?: {

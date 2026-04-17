@@ -46,6 +46,55 @@ type AdminTabId =
   | 'training-gaps'
   | 'ai-insights';
 
+type RegionalInsightsDashboard = Awaited<ReturnType<typeof getRegionalInsightsDashboard>>;
+
+const ADMIN_TABS: AdminTabId[] = [
+  'regional',
+  'twinning',
+  'notifications',
+  'privacy',
+  'freshness',
+  'dictionary',
+  'audit',
+  'underserved',
+  'segmentation',
+  'pending-documents',
+  'pending-topics',
+  'bulk-import',
+  'delivery',
+  'feedback',
+  'training-gaps',
+  'ai-insights',
+];
+
+const INSIGHT_TAB_SET = new Set<AdminTabId>([
+  'regional',
+  'twinning',
+  'privacy',
+  'freshness',
+  'underserved',
+  'segmentation',
+]);
+
+function createEmptyInsights(): RegionalInsightsDashboard {
+  return {
+    divisionSnapshots: [],
+    underservedAreas: [],
+    needsSegmentation: [],
+    freshnessIndicators: [],
+    coverageGaps: [],
+    topPriorityRegions: [],
+    programRecommendations: [],
+    schoolActivity: [],
+    twinningTargets: [],
+    anonymizedResearchSummary: {
+      totalConsentedTeachers: 0,
+      anonymizedDatasetRows: 0,
+      includedRegions: 0,
+    },
+  };
+}
+
 export default async function AdminPage({ searchParams }: PageProps) {
   const user = await getCurrentUser();
 
@@ -62,17 +111,29 @@ export default async function AdminPage({ searchParams }: PageProps) {
   }
 
   const { moderated, tab } = await searchParams;
-  const [pendingResources, pendingTopics, insights, auditLogs, notifications, unreadNotifications, deliveries, trainingGaps, feedbackSummaries, aiFieldAlerts] = await Promise.all([
-    getPendingResources(),
-    getPendingForumTopics(),
-    getRegionalInsightsDashboard(),
-    getRecentAuditLogs(25),
-    getNotificationsForUser(user.id, 20),
-    getUnreadNotificationCount(user.id),
-    getProgramDeliveries(),
-    getTrainingGapsByRegion(),
-    getAllFeedbackSummaries(),
-    getAiFieldAlerts(),
+  const activeTab = ADMIN_TABS.includes((tab ?? '') as AdminTabId) ? (tab as AdminTabId) : 'regional';
+
+  const shouldLoadInsights = INSIGHT_TAB_SET.has(activeTab);
+  const shouldLoadRegionalAnalytics = shouldLoadInsights && activeTab !== 'twinning';
+  const shouldLoadSchoolActivity = activeTab === 'twinning';
+  const shouldLoadDeliveries = activeTab === 'delivery' || activeTab === 'feedback';
+
+  const [insights, pendingResources, pendingTopics, auditLogs, notifications, unreadNotifications, deliveries, trainingGaps, feedbackSummaries, aiFieldAlerts] = await Promise.all([
+    shouldLoadInsights
+      ? getRegionalInsightsDashboard({
+        includeRegionalAnalytics: shouldLoadRegionalAnalytics,
+        includeSchoolActivity: shouldLoadSchoolActivity,
+      })
+      : Promise.resolve(createEmptyInsights()),
+    activeTab === 'pending-documents' ? getPendingResources() : Promise.resolve([]),
+    activeTab === 'pending-topics' ? getPendingForumTopics() : Promise.resolve([]),
+    activeTab === 'audit' ? getRecentAuditLogs(25) : Promise.resolve([]),
+    activeTab === 'notifications' ? getNotificationsForUser(user.id, 20) : Promise.resolve([]),
+    activeTab === 'notifications' ? getUnreadNotificationCount(user.id) : Promise.resolve(0),
+    shouldLoadDeliveries ? getProgramDeliveries() : Promise.resolve([]),
+    activeTab === 'training-gaps' ? getTrainingGapsByRegion() : Promise.resolve([]),
+    activeTab === 'feedback' ? getAllFeedbackSummaries() : Promise.resolve([]),
+    activeTab === 'ai-insights' ? getAiFieldAlerts() : Promise.resolve([]),
   ]);
 
   const needsByRegion = new Map(insights.needsSegmentation.map((item) => [item.region, item]));
@@ -80,24 +141,22 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
   const tabs: Array<{ id: AdminTabId; label: string }> = [
     { id: 'regional', label: 'Regional Dashboard' },
-    { id: 'twinning', label: `Twinning Targets (${insights.twinningTargets.length})` },
-    { id: 'notifications', label: `Notifications (${unreadNotifications})` },
+    { id: 'twinning', label: 'Twinning Targets' },
+    { id: 'notifications', label: 'Notifications' },
     { id: 'privacy', label: 'Privacy & Consent' },
     { id: 'freshness', label: 'Data Freshness' },
     { id: 'dictionary', label: 'Data Dictionary' },
     { id: 'audit', label: 'Audit Trail' },
     { id: 'underserved', label: 'Underserved Areas' },
     { id: 'segmentation', label: 'Needs Segmentation' },
-    { id: 'pending-documents', label: `Pending Documents (${pendingResources.length})` },
-    { id: 'pending-topics', label: `Pending Topics (${pendingTopics.length})` },
+    { id: 'pending-documents', label: 'Pending Documents' },
+    { id: 'pending-topics', label: 'Pending Topics' },
     { id: 'bulk-import', label: 'Bulk Teacher Import' },
-    { id: 'delivery', label: `Program Delivery (${deliveries.length})` },
-    { id: 'feedback', label: `Feedback (${feedbackSummaries.length})` },
+    { id: 'delivery', label: 'Program Delivery' },
+    { id: 'feedback', label: 'Feedback' },
     { id: 'training-gaps', label: 'Training Gaps' },
-    { id: 'ai-insights', label: `AI Field Insights (${aiFieldAlerts.length})` },
+    { id: 'ai-insights', label: 'AI Field Insights' },
   ];
-
-  const activeTab = tabs.some((item) => item.id === tab) ? (tab as AdminTabId) : 'regional';
 
   return (
     <div className={adminStyles.pageContainer}>

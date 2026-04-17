@@ -365,7 +365,43 @@ async function buildSchoolActivityAndTwinningInsights() {
   };
 }
 
-export async function getRegionalInsightsDashboard() {
+type RegionalInsightsOptions = {
+  includeRegionalAnalytics?: boolean;
+  includeSchoolActivity?: boolean;
+};
+
+export async function getRegionalInsightsDashboard(options: RegionalInsightsOptions = {}) {
+  const includeRegionalAnalytics = options.includeRegionalAnalytics ?? true;
+  const includeSchoolActivity = options.includeSchoolActivity ?? true;
+
+  const emptySchoolInsights = {
+    schoolActivity: [] as SchoolActivitySnapshot[],
+    twinningTargets: [] as TwinningRecommendation[],
+  };
+
+  if (!includeRegionalAnalytics) {
+    const schoolInsights = includeSchoolActivity
+      ? await buildSchoolActivityAndTwinningInsights()
+      : emptySchoolInsights;
+
+    return {
+      divisionSnapshots: [] as RegionalDivisionSnapshot[],
+      underservedAreas: [] as RegionalDivisionSnapshot[],
+      needsSegmentation: [] as NeedsSegmentationByRegion[],
+      freshnessIndicators: [] as RegionFreshnessIndicator[],
+      coverageGaps: [] as RegionalCoverageGap[],
+      topPriorityRegions: [] as PriorityRegionInsight[],
+      programRecommendations: [] as ProgramRecommendationCard[],
+      schoolActivity: schoolInsights.schoolActivity,
+      twinningTargets: schoolInsights.twinningTargets,
+      anonymizedResearchSummary: {
+        totalConsentedTeachers: 0,
+        anonymizedDatasetRows: 0,
+        includedRegions: 0,
+      } as AnonymizedResearchSummary,
+    };
+  }
+
   const rows = (await db`
     select
       id,
@@ -404,8 +440,8 @@ export async function getRegionalInsightsDashboard() {
       coverageGaps,
       topPriorityRegions: [] as PriorityRegionInsight[],
       programRecommendations: [] as ProgramRecommendationCard[],
-      schoolActivity: [] as SchoolActivitySnapshot[],
-      twinningTargets: [] as TwinningRecommendation[],
+      schoolActivity: emptySchoolInsights.schoolActivity,
+      twinningTargets: emptySchoolInsights.twinningTargets,
       anonymizedResearchSummary: {
         totalConsentedTeachers: 0,
         anonymizedDatasetRows: 0,
@@ -760,7 +796,9 @@ export async function getRegionalInsightsDashboard() {
 
   topPriorityRegions.sort((a, b) => b.priorityScore - a.priorityScore || a.teacherCount - b.teacherCount);
   programRecommendations.sort((a, b) => b.priorityScore - a.priorityScore || a.teacherCount - b.teacherCount);
-  const { schoolActivity, twinningTargets } = await buildSchoolActivityAndTwinningInsights();
+  const schoolInsights = includeSchoolActivity
+    ? await buildSchoolActivityAndTwinningInsights()
+    : emptySchoolInsights;
 
   return {
     divisionSnapshots,
@@ -770,8 +808,8 @@ export async function getRegionalInsightsDashboard() {
     coverageGaps,
     topPriorityRegions,
     programRecommendations,
-    schoolActivity,
-    twinningTargets,
+    schoolActivity: schoolInsights.schoolActivity,
+    twinningTargets: schoolInsights.twinningTargets,
     anonymizedResearchSummary: {
       totalConsentedTeachers: rows.filter((row) => row.consent_research).length,
       anonymizedDatasetRows,

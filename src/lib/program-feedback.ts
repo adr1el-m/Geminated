@@ -21,28 +21,39 @@ export type FeedbackSummary = {
   recentComments: string[];
 };
 
+let feedbackSchemaReady: Promise<void> | null = null;
+
 async function ensureFeedbackSchema() {
-  await db`
-    create table if not exists program_feedback (
-      id uuid primary key default gen_random_uuid(),
-      delivery_id uuid not null references program_deliveries(id) on delete cascade,
-      teacher_id uuid not null references profiles(id) on delete cascade,
-      attended boolean not null default true,
-      rating integer check (rating >= 1 and rating <= 5),
-      usefulness_score integer check (usefulness_score >= 1 and usefulness_score <= 5),
-      comments text,
-      submitted_at timestamptz not null default now(),
-      unique(delivery_id, teacher_id)
-    )
-  `;
-  await db`
-    create index if not exists program_feedback_delivery_idx
-    on program_feedback(delivery_id, submitted_at desc)
-  `;
-  await db`
-    create index if not exists program_feedback_teacher_idx
-    on program_feedback(teacher_id)
-  `;
+  if (!feedbackSchemaReady) {
+    feedbackSchemaReady = (async () => {
+      await db`
+        create table if not exists program_feedback (
+          id uuid primary key default gen_random_uuid(),
+          delivery_id uuid not null references program_deliveries(id) on delete cascade,
+          teacher_id uuid not null references profiles(id) on delete cascade,
+          attended boolean not null default true,
+          rating integer check (rating >= 1 and rating <= 5),
+          usefulness_score integer check (usefulness_score >= 1 and usefulness_score <= 5),
+          comments text,
+          submitted_at timestamptz not null default now(),
+          unique(delivery_id, teacher_id)
+        )
+      `;
+      await db`
+        create index if not exists program_feedback_delivery_idx
+        on program_feedback(delivery_id, submitted_at desc)
+      `;
+      await db`
+        create index if not exists program_feedback_teacher_idx
+        on program_feedback(teacher_id)
+      `;
+    })().catch((error) => {
+      feedbackSchemaReady = null;
+      throw error;
+    });
+  }
+
+  await feedbackSchemaReady;
 }
 
 export async function submitFeedback(input: {
@@ -148,13 +159,43 @@ export async function getFeedbackSummaryForDelivery(deliveryId: string): Promise
 export async function getAllFeedbackSummaries(): Promise<FeedbackSummary[]> {
   await ensureFeedbackSchema();
 
-  const deliveryIds = await db`
-    select distinct delivery_id from program_feedback
-  ` as { delivery_id: string }[];
+  const rows = await db`
+    select
+      pf.delivery_id,
+      count(*)::int as total_responses,
+      round((sum(case when pf.attended then 1 else 0 end)::numeric / nullif(count(*), 0)::numeric) * 100)::int as attendance_rate,
+      round(avg(pf.rating)::numeric, 1)::float as average_rating,
+      round(avg(pf.usefulness_score)::numeric, 1)::float as average_usefulness,
+      coalesce((
+        select array_agg(comment_rows.comments order by comment_rows.submitted_at desc)
+        from (
+          select comments, submitted_at
+          from program_feedback pf_comments
+          where pf_comments.delivery_id = pf.delivery_id
+            and pf_comments.comments is not null
+            and btrim(pf_comments.comments) <> ''
+          order by pf_comments.submitted_at desc
+          limit 5
+        ) as comment_rows
+      ), '{}'::text[]) as recent_comments
+    from program_feedback pf
+    group by pf.delivery_id
+    order by count(*) desc
+  ` as Array<{
+    delivery_id: string;
+    total_responses: number;
+    attendance_rate: number;
+    average_rating: number | null;
+    average_usefulness: number | null;
+    recent_comments: string[];
+  }>;
 
-  const summaries = await Promise.all(
-    deliveryIds.map(({ delivery_id }) => getFeedbackSummaryForDelivery(delivery_id))
-  );
-
-  return summaries.sort((a, b) => b.totalResponses - a.totalResponses);
+  return rows.map((row) => ({
+    deliveryId: row.delivery_id,
+    totalResponses: Number(row.total_responses) || 0,
+    attendanceRate: Number(row.attendance_rate) || 0,
+    averageRating: row.average_rating === null ? null : Number(row.average_rating),
+    averageUsefulness: row.average_usefulness === null ? null : Number(row.average_usefulness),
+    recentComments: Array.isArray(row.recent_comments) ? row.recent_comments : [],
+  }));
 }
