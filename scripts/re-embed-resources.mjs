@@ -3,8 +3,11 @@ import 'dotenv/config';
 
 // Initialize Neon client
 const db = postgres(process.env.DATABASE_URL, { ssl: 'require' });
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_EMBEDDING_MODEL = process.env.GROQ_EMBEDDING_MODEL || 'nomic-embed-text-v1.5';
+const GROQ_EMBEDDINGS_API_URL = 'https://api.groq.com/openai/v1/embeddings';
 
-function generateTextEmbedding(text, dimensions = 768) {
+function generateDeterministicEmbedding(text, dimensions = 768) {
   const vector = new Array(dimensions).fill(0);
 
   for (let i = 0; i < text.length; i++) {
@@ -16,6 +19,57 @@ function generateTextEmbedding(text, dimensions = 768) {
 
   const norm = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0)) || 1;
   return vector.map((value) => Number((value / norm).toFixed(6)));
+}
+
+function normalizeText(text) {
+  return String(text || '').replace(/\s+/g, ' ').trim().slice(0, 8000);
+}
+
+async function generateTextEmbedding(text) {
+  const normalized = normalizeText(text);
+  if (!normalized) {
+    return [];
+  }
+
+  if (!GROQ_API_KEY || GROQ_API_KEY.includes('your_groq_api_key_here')) {
+    return generateDeterministicEmbedding(normalized);
+  }
+
+  try {
+    const response = await fetch(GROQ_EMBEDDINGS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: GROQ_EMBEDDING_MODEL,
+        input: normalized,
+        encoding_format: 'float',
+      }),
+    });
+
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      const message = payload?.error?.message || `Groq embeddings request failed (${response.status})`;
+      throw new Error(message);
+    }
+
+    const rawVector = payload?.data?.[0]?.embedding;
+    if (!Array.isArray(rawVector) || rawVector.length === 0) {
+      throw new Error('Groq returned an empty embedding vector.');
+    }
+
+    const vector = rawVector.map((value) => Number(value)).filter((value) => Number.isFinite(value));
+    if (vector.length === 0) {
+      throw new Error('Groq returned a malformed embedding vector.');
+    }
+
+    return vector;
+  } catch (error) {
+    console.warn('Semantic embedding failed, falling back to deterministic embedding:', error instanceof Error ? error.message : error);
+    return generateDeterministicEmbedding(normalized);
+  }
 }
 
 async function main() {
@@ -41,7 +95,7 @@ async function main() {
         .filter(Boolean)
         .join('\n\n');
 
-      const embedding = generateTextEmbedding(textForEmbedding);
+      const embedding = await generateTextEmbedding(textForEmbedding);
 
       if (embedding && embedding.length > 0) {
         await db`

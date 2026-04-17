@@ -33,6 +33,7 @@ type ProfileEditFormProps = {
     consentResearch: boolean;
     anonymizationOptOut: boolean;
     yearsOfExperience: number;
+    role: string;
   };
 };
 
@@ -79,127 +80,135 @@ export default function ProfileEditForm({ initial }: ProfileEditFormProps) {
           </select>
         </label>
 
-        <label className={profileStyles.formLabel}>
-          Region
-          <select
-            name="region"
-            required
-            value={selectedRegion}
-            onChange={(event) => {
-              const nextRegion = event.target.value;
-              const nextDivisions = REGION_DIVISIONS_BY_REGION[nextRegion] ?? [];
-              setSelectedRegion(nextRegion);
-              setSelectedDivision(nextDivisions[0] ?? '');
-            }}
-          >
-            {PROFILE_REGIONS.map((region) => (
-              <option key={region} value={region}>
-                {REGION_DISPLAY_NAMES[region] ?? region}
-              </option>
-            ))}
-          </select>
-        </label>
+        {initial.role === 'teacher' && (
+          <>
+            <label className={profileStyles.formLabel}>
+              Region
+              <select
+                name="region"
+                required
+                value={selectedRegion}
+                onChange={(event) => {
+                  const nextRegion = event.target.value;
+                  const nextDivisions = REGION_DIVISIONS_BY_REGION[nextRegion] ?? [];
+                  setSelectedRegion(nextRegion);
+                  setSelectedDivision(nextDivisions[0] ?? '');
+                }}
+              >
+                {PROFILE_REGIONS.map((region) => (
+                  <option key={region} value={region}>
+                    {REGION_DISPLAY_NAMES[region] ?? region}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-        <label className={profileStyles.formLabel}>
-          Division
-          <select
-            name="division"
-            required
-            value={selectedDivision}
-            onChange={(event) => setSelectedDivision(event.target.value)}
-          >
-            <option value="" disabled>
-              Select Division
-            </option>
-            {divisionOptions.map((division) => (
-              <option key={division} value={division}>
-                {division}
-              </option>
-            ))}
-          </select>
-        </label>
+            <label className={profileStyles.formLabel}>
+              Division
+              <select
+                name="division"
+                required
+                value={selectedDivision}
+                onChange={(event) => setSelectedDivision(event.target.value)}
+              >
+                <option value="" disabled>
+                  Select Division
+                </option>
+                {divisionOptions.map((division) => (
+                  <option key={division} value={division}>
+                    {division}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-        <label className={profileStyles.formLabel}>
-          School / Institution
-          <input name="school" type="text" required defaultValue={initial.school} />
-        </label>
+            <label className={profileStyles.formLabel}>
+              School / Institution
+              <input name="school" type="text" required defaultValue={initial.school} />
+            </label>
 
-        <label className={profileStyles.formLabel}>
-          Highest Qualification
-          <select name="qualificationLevel" required defaultValue={initial.qualificationLevel}>
-            {REGISTRATION_QUALIFICATION_LEVELS.map((qualification) => (
-              <option key={qualification} value={qualification}>
-                {qualification}
-              </option>
-            ))}
-          </select>
-        </label>
+            <label className={profileStyles.formLabel}>
+              Highest Qualification
+              <select name="qualificationLevel" required defaultValue={initial.qualificationLevel}>
+                {REGISTRATION_QUALIFICATION_LEVELS.map((qualification) => (
+                  <option key={qualification} value={qualification}>
+                    {qualification}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-        <label className={profileStyles.formLabel}>
-          Gender
-          <select name="gender" required defaultValue={initial.gender}>
-            {REGISTRATION_GENDER_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
+            <label className={profileStyles.formLabel}>
+              Gender
+              <select name="gender" required defaultValue={initial.gender}>
+                {REGISTRATION_GENDER_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-        <label className={profileStyles.formLabel}>
-          Age Bracket
-          <select name="ageBracket" required defaultValue={initial.ageBracket}>
-            {REGISTRATION_AGE_BRACKETS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
+            <label className={profileStyles.formLabel}>
+              Age Bracket
+              <select name="ageBracket" required defaultValue={initial.ageBracket}>
+                {REGISTRATION_AGE_BRACKETS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-        <label className={profileStyles.formLabel}>
-          Years of Experience
-          <input
-            name="yearsOfExperience"
-            type="number"
-            min={0}
-            max={60}
-            required
-            defaultValue={initial.yearsOfExperience}
-          />
-        </label>
+            <label className={profileStyles.formLabel}>
+              Years of Experience
+              <input
+                name="yearsOfExperience"
+                type="number"
+                min={0}
+                max={60}
+                required
+                defaultValue={initial.yearsOfExperience}
+              />
+            </label>
+          </>
+        )}
       </div>
 
-      <label className={profileStyles.formLabel}>
-        Subjects Taught
-        <textarea
-          name="subjectsTaught"
-          rows={3}
-          placeholder="Separate multiple subjects with commas"
-          defaultValue={initial.subjectsTaught.join(', ')}
-        />
-      </label>
+      {initial.role === 'teacher' && (
+        <>
+          <label className={profileStyles.formLabel}>
+            Subjects Taught
+            <textarea
+              name="subjectsTaught"
+              rows={3}
+              placeholder="Separate multiple subjects with commas"
+              defaultValue={initial.subjectsTaught.join(', ')}
+            />
+          </label>
 
-      <label className={profileStyles.formLabel}>
-        STAR Participation Status
-        <select name="starParticipationStatus" required defaultValue={initial.starParticipationStatus}>
-          {STAR_PARTICIPATION_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-      </label>
+          <label className={profileStyles.formLabel}>
+            STAR Participation Status
+            <select name="starParticipationStatus" required defaultValue={initial.starParticipationStatus}>
+              {STAR_PARTICIPATION_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
 
-      <label className={profileStyles.formLabel}>
-        Training History
-        <textarea
-          name="trainingHistory"
-          rows={3}
-          placeholder="One training per line"
-          defaultValue={initial.trainingHistory.join('\n')}
-        />
-      </label>
+          <label className={profileStyles.formLabel}>
+            Training History
+            <textarea
+              name="trainingHistory"
+              rows={3}
+              placeholder="One training per line"
+              defaultValue={initial.trainingHistory.join('\n')}
+            />
+          </label>
+        </>
+      )}
 
       <div className={profileStyles.checkboxGroup}>
         <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--institutional-blue)', marginBottom: '0.25rem' }}>

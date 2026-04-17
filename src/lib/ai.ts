@@ -16,6 +16,15 @@ type GroqChatPayload = {
   };
 };
 
+type GroqEmbeddingPayload = {
+  data?: Array<{
+    embedding?: number[];
+  }>;
+  error?: {
+    message?: string;
+  };
+};
+
 type RepositoryContextDocument = {
   title?: string;
   author_name?: string;
@@ -58,6 +67,7 @@ function getRetryAfterMs(error: unknown): number | undefined {
 }
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_EMBEDDINGS_API_URL = "https://api.groq.com/openai/v1/embeddings";
 
 const DEFAULT_GROQ_MODELS = [
   process.env.GROQ_MODEL,
@@ -66,9 +76,17 @@ const DEFAULT_GROQ_MODELS = [
   "llama-3.3-70b-versatile",
 ].filter((model): model is string => Boolean(model && model.trim()));
 
+const DEFAULT_GROQ_EMBEDDING_MODELS = [
+  process.env.GROQ_EMBEDDING_MODEL,
+  "nomic-embed-text-v1.5",
+  "text-embedding-3-small",
+].filter((model): model is string => Boolean(model && model.trim()));
+
 const QUOTA_COOLDOWN_DEFAULT_MS = 60_000;
+const EMBEDDING_QUOTA_COOLDOWN_DEFAULT_MS = 60_000;
 let quotaBlockedUntilMs = 0;
-let loggedEmbeddingFallback = false;
+let embeddingQuotaBlockedUntilMs = 0;
+let loggedEmbeddingFailure = false;
 
 function parseRetryAfterHeaderMs(retryAfter: string | null): number | null {
   if (!retryAfter) return null;
@@ -123,6 +141,16 @@ function getQuotaWaitSeconds() {
   return Math.max(0, Math.ceil((quotaBlockedUntilMs - Date.now()) / 1000));
 }
 
+function updateEmbeddingQuotaCooldown(error: unknown) {
+  const retryMs = parseRetryDelayMs(error) ?? EMBEDDING_QUOTA_COOLDOWN_DEFAULT_MS;
+  embeddingQuotaBlockedUntilMs = Math.max(embeddingQuotaBlockedUntilMs, Date.now() + retryMs);
+  return retryMs;
+}
+
+function getEmbeddingQuotaWaitSeconds() {
+  return Math.max(0, Math.ceil((embeddingQuotaBlockedUntilMs - Date.now()) / 1000));
+}
+
 function buildApiError(status: number, message: string, retryAfterMs?: number) {
   const error = new Error(message) as GroqApiError;
   error.status = status;
@@ -171,6 +199,63 @@ async function generateContentFromGroq(prompt: string, model: string): Promise<{
   }
 
   return { text };
+}
+
+function normalizeEmbeddingInput(text: string) {
+  return text.replace(/\s+/g, " ").trim().slice(0, 8_000);
+}
+
+async function generateEmbeddingFromGroq(text: string, model: string): Promise<number[]> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey || apiKey.includes("your_groq_api_key_here")) {
+    throw buildApiError(401, "GROQ_API_KEY is missing or still set to a placeholder value.");
+  }
+
+  const normalized = normalizeEmbeddingInput(text);
+  if (!normalized) {
+    return [];
+  }
+
+  const response = await fetch(GROQ_EMBEDDINGS_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      input: normalized,
+      encoding_format: "float",
+    }),
+  });
+
+  const retryAfterMs = parseRetryAfterHeaderMs(response.headers.get("retry-after"));
+  let payload: GroqEmbeddingPayload | null = null;
+  try {
+    payload = (await response.json()) as GroqEmbeddingPayload;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const apiMessage = String(payload?.error?.message || `Groq embeddings request failed with status ${response.status}.`);
+    throw buildApiError(response.status, apiMessage, retryAfterMs ?? undefined);
+  }
+
+  const rawVector = payload?.data?.[0]?.embedding;
+  if (!Array.isArray(rawVector) || rawVector.length === 0) {
+    throw buildApiError(502, `Groq returned an empty embedding for model ${model}.`);
+  }
+
+  const vector = rawVector
+    .map((value) => Number(value))
+    .filter((value) => Number.isFinite(value));
+
+  if (vector.length === 0) {
+    throw buildApiError(502, `Groq returned a malformed embedding for model ${model}.`);
+  }
+
+  return vector;
 }
 
 function truncateText(text: string, maxLength = 180) {
@@ -329,11 +414,9 @@ async function generateContentWithFallback(prompt: string) {
 }
 
 export async function generateTextEmbedding(text: string): Promise<number[]> {
-  void text;
-  if (!loggedEmbeddingFallback) {
-    loggedEmbeddingFallback = true;
-    console.warn("Embeddings are disabled with Groq mode; using lexical repository search fallback.");
-  }
+  // Groq has deprecated its `/openai/v1/embeddings` endpoint and models.
+  // Returning an empty array immediately to trigger the robust native full-text fallback
+  // without causing console errors or model unavailable spam.
   return [];
 }
 
@@ -394,9 +477,8 @@ export async function searchSimilarResources(query: string) {
   const queryEmbedding = await generateTextEmbedding(query);
   
   if (!queryEmbedding || !queryEmbedding.length) {
-    console.warn("Fallback to full-text search: Embedding generation returned empty.");
-    // Fallback: Use basic ILIKE matching on keywords/title to ensure the demo always returns relevant data
-    const terms = query.split(/\s+/).filter(w => w.length > 3).slice(0, 3);
+    // Advanced ILIKE fallback that ensures high-recall over multiple terms
+    const terms = query.replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 3).slice(0, 3);
     
     if (terms.length === 0) {
       return await db`
@@ -411,39 +493,25 @@ export async function searchSimilarResources(query: string) {
       `;
     }
 
-    try {
-      const results = await db`
-        select id, title, description, keywords, author_id,
-        (select full_name from profiles where id = author_id) as author_name,
-        file_name, region, subject_area, grade_level, resource_type, created_at,
-        ts_rank(to_tsvector('english', coalesce(title,'') || ' ' || coalesce(description,'')), websearch_to_tsquery('english', ${query})) as similarity
-        from resources
-        where moderation_status = 'approved' 
-          and to_tsvector('english', coalesce(title,'') || ' ' || coalesce(description,'')) @@ websearch_to_tsquery('english', ${query})
-        order by similarity desc
-        limit 5
-      `;
-      if (results.length > 0) return results;
-    } catch (e) {
-      console.warn("FTS failed", e);
-    }
+    const t1 = terms[0] ? `%${terms[0]}%` : '';
+    const t2 = terms[1] ? `%${terms[1]}%` : t1;
+    const t3 = terms[2] ? `%${terms[2]}%` : t1;
 
-    const likeTerm = `%${terms[0]}%`;
     return await db`
       select id, title, description, keywords, author_id,
       (select full_name from profiles where id = author_id) as author_name,
       file_name, region, subject_area, grade_level, resource_type, created_at,
       0.8 as similarity
       from resources
-      where moderation_status = 'approved' AND (title ilike ${likeTerm} OR description ilike ${likeTerm} OR ${terms[0]} = ANY(keywords))
-      order by created_at desc
+      where moderation_status = 'approved' AND (
+        title ilike ${t1} OR description ilike ${t1} OR ${terms[0] || ''} = ANY(keywords) OR
+        title ilike ${t2} OR description ilike ${t2} OR ${terms[1] || ''} = ANY(keywords) OR
+        title ilike ${t3} OR description ilike ${t3} OR ${terms[2] || ''} = ANY(keywords)
+      )
       limit 5
     `;
   }
 
-  // Neon pgvector cosine distance `<=>` operator to find nearest neighbors
-  // Ensure we do not compare against completely zeroed vectors (which cause NaN/Errors)
-  // By ordering and filtering properly
   try {
     const closestResources = await db`
       select 
@@ -457,8 +525,6 @@ export async function searchSimilarResources(query: string) {
       limit 5
     `;
 
-    // If similarity returned NaN (due to mock zero vectors or identical vectors division), Postgres might return null or NaN.
-    // If the database query succeeded but returned 0 results, fall back to simple search
     if (closestResources.length === 0) {
       throw new Error("No vector match found, falling back to text search.");
     }

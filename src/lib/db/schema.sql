@@ -1,6 +1,7 @@
 -- STAR-LINK Neon schema
 
 create extension if not exists pgcrypto;
+create extension if not exists vector;
 
 create table if not exists profiles (
   id uuid primary key default gen_random_uuid(),
@@ -156,6 +157,7 @@ create table if not exists resources (
   mime_type text not null,
   file_size integer not null,
   file_data bytea not null,
+  embedding vector,
   moderation_status text not null default 'pending' check (moderation_status in ('pending', 'approved', 'rejected')),
   moderated_by uuid references profiles(id) on delete set null,
   moderated_at timestamptz,
@@ -165,6 +167,9 @@ create table if not exists resources (
 
 create index if not exists resources_created_at_idx on resources(created_at desc);
 create index if not exists resources_moderation_status_idx on resources(moderation_status);
+create index if not exists resources_embedding_cosine_idx
+on resources using ivfflat (embedding vector_cosine_ops)
+with (lists = 100);
 
 alter table forum_posts add column if not exists moderation_status text not null default 'pending';
 alter table forum_posts add column if not exists moderated_by uuid references profiles(id) on delete set null;
@@ -179,6 +184,7 @@ alter table resources add column if not exists subject_area text not null defaul
 alter table resources add column if not exists grade_level text not null default 'Multi-level';
 alter table resources add column if not exists resource_type text not null default 'Teaching Resource';
 alter table resources add column if not exists keywords text[] not null default '{}'::text[];
+alter table resources add column if not exists embedding vector;
 
 alter table forum_comments add column if not exists image_mime_type text;
 alter table forum_comments add column if not exists image_data bytea;

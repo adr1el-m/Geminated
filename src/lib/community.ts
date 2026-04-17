@@ -1,5 +1,6 @@
 import { db } from './db';
 import { MOCK_SEED_EMAILS } from './constants';
+import { generateTextEmbedding } from './ai';
 
 export type ModerationStatus = 'pending' | 'approved' | 'rejected';
 
@@ -8,6 +9,8 @@ let moderationSchemaReady: Promise<void> | null = null;
 export async function ensureModerationSchema() {
   if (!moderationSchemaReady) {
     moderationSchemaReady = (async () => {
+      await db`create extension if not exists vector`;
+
       await db`
         alter table forum_posts
         add column if not exists moderation_status text not null default 'pending'
@@ -122,6 +125,15 @@ export async function ensureModerationSchema() {
       await db`
         alter table resources
         add column if not exists keywords text[] not null default '{}'::text[]
+      `;
+      await db`
+        alter table resources
+        add column if not exists embedding vector
+      `;
+      await db`
+        create index if not exists resources_embedding_cosine_idx
+        on resources using ivfflat (embedding vector_cosine_ops)
+        with (lists = 100)
       `;
     })().catch((error) => {
       moderationSchemaReady = null;
@@ -603,6 +615,64 @@ export async function createResourceUpload(input: {
   authorId: string;
 }) {
   await ensureModerationSchema();
+
+  const embeddingContext = [
+    input.title,
+    input.description ?? '',
+    input.region,
+    input.subjectArea,
+    input.gradeLevel,
+    input.resourceType,
+    input.keywords.join(', '),
+  ]
+    .filter(Boolean)
+    .join('\n\n');
+
+  const embedding = await generateTextEmbedding(embeddingContext);
+
+  if (embedding.length > 0) {
+    try {
+      const rowsWithEmbedding = (await db`
+        insert into resources (
+          title,
+          description,
+          region,
+          subject_area,
+          grade_level,
+          resource_type,
+          keywords,
+          file_name,
+          mime_type,
+          file_size,
+          file_data,
+          embedding,
+          moderation_status,
+          author_id
+        )
+        values (
+          ${input.title},
+          ${input.description},
+          ${input.region},
+          ${input.subjectArea},
+          ${input.gradeLevel},
+          ${input.resourceType},
+          ${input.keywords},
+          ${input.fileName},
+          ${input.mimeType},
+          ${input.fileSize},
+          ${input.fileData},
+          ${JSON.stringify(embedding)}::vector,
+          ${'pending'},
+          ${input.authorId}
+        )
+        returning id
+      `) as { id: string }[];
+
+      return rowsWithEmbedding[0]?.id;
+    } catch (error) {
+      console.warn('Resource embedding insert failed; retrying without embedding.', error);
+    }
+  }
 
   const rows = (await db`
     insert into resources (

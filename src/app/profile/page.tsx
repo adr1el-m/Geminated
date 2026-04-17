@@ -13,7 +13,7 @@ import { markAllNotificationsReadAction } from '@/app/actions/notifications';
 import { getTrainingRecordsForTeacher } from '@/lib/training-records';
 
 function getAvatarByName(name: string, role: string) {
-  if (role === 'admin') return '/img/admin-profile.png';
+  if (role === 'admin') return '/img/favicon.png';
 
   const normalized = name.toLowerCase();
 
@@ -88,84 +88,93 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
             <strong>{profile.email}</strong>
           </div>
           <div className={profileStyles.infoItem}>
-            <span>Occupation</span>
+            <span>Occupation / Role</span>
             <strong>{profile.occupation}</strong>
           </div>
-          <div className={profileStyles.infoItem}>
-            <span>Region</span>
-            <strong>{profile.region}</strong>
-          </div>
-          <div className={profileStyles.infoItem}>
-            <span>Division</span>
-            <strong>{profile.division}</strong>
-          </div>
-          <div className={profileStyles.infoItem}>
-            <span>School / Institution</span>
-            <strong>{profile.school}</strong>
-          </div>
-          <div className={profileStyles.infoItem}>
-            <span>Highest Qualification</span>
-            <strong>{profile.qualification_level}</strong>
-          </div>
-          <div className={profileStyles.infoItem}>
-            <span>Demographics</span>
-            <strong>{profile.gender} • {profile.age_bracket}</strong>
-          </div>
-          <div className={profileStyles.infoItem}>
-            <span>STAR Participation</span>
-            <strong>{profile.star_participation_status}</strong>
-          </div>
-          <div className={profileStyles.infoItem}>
-            <span>Data Quality Score</span>
-            <strong>{profile.data_quality_score}/100</strong>
-          </div>
-
           <div className={profileStyles.infoItem}>
             <span>Last Profile Update</span>
             <strong>{formatDateTimeNoSeconds(profile.profile_last_updated_at)}</strong>
           </div>
-          <div className={profileStyles.infoItem}>
-            <span>Subjects Taught</span>
-            <div className={profileStyles.tagGrid}>
-              {profile.subjects_taught?.length > 0 ? (
-                profile.subjects_taught.map((tag) => (
-                  <span key={tag} className={profileStyles.tag}>
-                    {tag}
-                  </span>
-                ))
+
+          {profile.role === 'teacher' && (
+            <>
+              <div className={profileStyles.infoItem}>
+                <span>Region</span>
+                <strong>{profile.region}</strong>
+              </div>
+              <div className={profileStyles.infoItem}>
+                <span>Division</span>
+                <strong>{profile.division}</strong>
+              </div>
+              <div className={profileStyles.infoItem}>
+                <span>School / Institution</span>
+                <strong>{profile.school}</strong>
+              </div>
+              <div className={profileStyles.infoItem}>
+                <span>Highest Qualification</span>
+                <strong>{profile.qualification_level}</strong>
+              </div>
+              <div className={profileStyles.infoItem}>
+                <span>Demographics</span>
+                <strong>{profile.gender} • {profile.age_bracket}</strong>
+              </div>
+              <div className={profileStyles.infoItem}>
+                <span>STAR Participation</span>
+                <strong>{profile.star_participation_status}</strong>
+              </div>
+              <div className={profileStyles.infoItem}>
+                <span>Data Quality Score</span>
+                <strong>{profile.data_quality_score}/100</strong>
+              </div>
+              <div className={profileStyles.infoItem}>
+                <span>Subjects Taught</span>
+                <div className={profileStyles.tagGrid}>
+                  {profile.subjects_taught?.length > 0 ? (
+                    profile.subjects_taught.map((tag) => (
+                      <span key={tag} className={profileStyles.tag}>
+                        {tag}
+                      </span>
+                    ))
+                  ) : (
+                    <span className={profileStyles.muted}>No subjects added yet.</span>
+                  )}
+                </div>
+              </div>
+              <div className={profileStyles.infoItem}>
+                <span>Years of Experience</span>
+                <strong>{profile.years_of_experience} Years</strong>
+              </div>
+            </>
+          )}
+
+          {profile.role === 'teacher' && (
+            <div className={profileStyles.infoItem}>
+              <span>Structured Training Records ({trainingRecords.length})</span>
+              {trainingRecords.length === 0 ? (
+                <span className={profileStyles.muted}>No structured training records yet.</span>
               ) : (
-                <span className={profileStyles.muted}>No subjects added yet.</span>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {trainingRecords.map((record) => (
+                    <li key={record.id} style={{ fontSize: '0.88rem', borderLeft: '3px solid var(--primary-blue)', paddingLeft: '0.75rem' }}>
+                      <strong>{record.program_title}</strong>
+                      {record.training_date ? <span style={{ color: 'var(--text-muted)' }}> · {record.training_date}</span> : null}
+                      {record.duration_hours ? <span style={{ color: 'var(--text-muted)' }}> · {record.duration_hours}h</span> : null}
+                      <br />
+                      <span style={{ color: 'var(--text-muted)' }}>{record.training_type} · {record.provider}</span>
+                      {record.verified ? <span style={{ color: '#15803d', fontWeight: 600, marginLeft: '0.4rem' }}> ✓ Verified</span> : null}
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
-          </div>
-          <div className={profileStyles.infoItem}>
-            <span>Years of Experience</span>
-            <strong>{profile.years_of_experience} Years</strong>
-          </div>
-          <div className={profileStyles.infoItem}>
-            <span>Structured Training Records ({trainingRecords.length})</span>
-            {trainingRecords.length === 0 ? (
-              <span className={profileStyles.muted}>No structured training records yet.</span>
-            ) : (
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {trainingRecords.map((record) => (
-                  <li key={record.id} style={{ fontSize: '0.88rem', borderLeft: '3px solid var(--primary-blue)', paddingLeft: '0.75rem' }}>
-                    <strong>{record.program_title}</strong>
-                    {record.training_date ? <span style={{ color: 'var(--text-muted)' }}> · {record.training_date}</span> : null}
-                    {record.duration_hours ? <span style={{ color: 'var(--text-muted)' }}> · {record.duration_hours}h</span> : null}
-                    <br />
-                    <span style={{ color: 'var(--text-muted)' }}>{record.training_type} · {record.provider}</span>
-                    {record.verified ? <span style={{ color: '#15803d', fontWeight: 600, marginLeft: '0.4rem' }}> ✓ Verified</span> : null}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          )}
 
-          <div className={profileStyles.infoItem}>
-            <span>Add Training Record</span>
-            <AddTrainingForm />
-          </div>
+          {profile.role === 'teacher' && (
+            <div className={profileStyles.infoItem}>
+              <span>Add Training Record</span>
+              <AddTrainingForm />
+            </div>
+          )}
 
           <div className={profileStyles.editSection}>
             <h4>Edit Profile</h4>
@@ -186,6 +195,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
                 consentResearch: profile.consent_research,
                 anonymizationOptOut: profile.anonymization_opt_out,
                 yearsOfExperience: profile.years_of_experience,
+                role: profile.role,
               }}
             />
           </div>

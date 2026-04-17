@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import {
   acceptCurrentUserTerms,
+  getCurrentUser,
   hasAcceptedLatestTerms,
   loginUser,
   registerUser,
@@ -79,7 +80,7 @@ export async function loginAction(_state: AuthActionState, formData: FormData) {
   }
 
   if (toProfile) {
-    redirect('/dashboard');
+    redirect('/profile');
   } else {
     redirect('/hub');
   }
@@ -284,26 +285,72 @@ export async function declineTermsAction() {
 }
 
 export async function updateProfileAction(_state: AuthActionState, formData: FormData) {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    return { error: 'You must be signed in to update your profile.' } satisfies AuthActionState;
+  }
+
+  const role = currentUser.role;
   const fullName = String(formData.get('fullName') ?? '').trim();
   const occupation = String(formData.get('occupation') ?? '').trim();
-  const region = String(formData.get('region') ?? '').trim();
-  const division = String(formData.get('division') ?? '').trim();
-  const school = String(formData.get('school') ?? '').trim();
-  const qualificationLevel = String(formData.get('qualificationLevel') ?? '').trim();
-  const gender = String(formData.get('gender') ?? '').trim();
-  const ageBracket = String(formData.get('ageBracket') ?? '').trim();
-  const yearsRaw = String(formData.get('yearsOfExperience') ?? '0').trim();
-  const subjectsRaw = String(formData.get('subjectsTaught') ?? '').trim();
-  const trainingHistoryRaw = String(formData.get('trainingHistory') ?? '').trim();
-  const starParticipationStatus = String(formData.get('starParticipationStatus') ?? '').trim();
+
+  // For admins, we only show Name and Occupation in the form.
+  // The rest of the fields should fall back to existing values.
+  const region = role === 'admin' ? currentUser.region : String(formData.get('region') ?? '').trim();
+  const division = role === 'admin' ? currentUser.division : String(formData.get('division') ?? '').trim();
+  const school = role === 'admin' ? currentUser.school : String(formData.get('school') ?? '').trim();
+  const qualificationLevel = role === 'admin' ? currentUser.qualification_level : String(formData.get('qualificationLevel') ?? '').trim();
+  const gender = role === 'admin' ? currentUser.gender : String(formData.get('gender') ?? '').trim();
+  const ageBracket = role === 'admin' ? currentUser.age_bracket : String(formData.get('ageBracket') ?? '').trim();
+  const yearsRaw = role === 'admin' ? String(currentUser.years_of_experience) : String(formData.get('yearsOfExperience') ?? '0').trim();
+  const subjectsRaw = role === 'admin' ? (currentUser.subjects_taught ?? []).join(', ') : String(formData.get('subjectsTaught') ?? '').trim();
+  const trainingHistoryRaw = role === 'admin' ? (currentUser.training_history ?? []).join('\n') : String(formData.get('trainingHistory') ?? '').trim();
+  const starParticipationStatus = role === 'admin' ? currentUser.star_participation_status : String(formData.get('starParticipationStatus') ?? '').trim();
   const consentDataProcessing = String(formData.get('dataProcessingConsent') ?? '') === 'on';
   const consentResearch = String(formData.get('researchConsent') ?? '') === 'on';
   const anonymizationOptOut = String(formData.get('anonymizeOptOut') ?? '') === 'on';
 
-  if (!fullName || !occupation || !region || !division || !school || !qualificationLevel || !gender || !ageBracket || !starParticipationStatus) {
-    return {
-      error: 'Full name, occupation, region, division, school, qualification, gender, age bracket, and STAR participation are required.',
-    } satisfies AuthActionState;
+  // Base validation
+  if (!fullName || !occupation) {
+    return { error: 'Full name and occupation are required.' } satisfies AuthActionState;
+  }
+
+  // Teacher-specific validation
+  if (role === 'teacher') {
+    if (!region || !division || !school || !qualificationLevel || !gender || !ageBracket || !starParticipationStatus) {
+      return {
+        error: 'Region, division, school, qualification, gender, age bracket, and STAR participation are required for teaching profiles.',
+      } satisfies AuthActionState;
+    }
+
+    if (!PHILIPPINE_REGIONS_SHORT.includes(region)) {
+      return { error: 'Please select a valid Philippine region.' } satisfies AuthActionState;
+    }
+
+    const divisionsForRegion = REGION_DIVISIONS_BY_REGION[region] ?? [];
+    if (divisionsForRegion.length > 0 && !divisionsForRegion.includes(division)) {
+      return { error: 'Please select a valid division for the selected region.' } satisfies AuthActionState;
+    }
+
+    if (!REGISTRATION_OCCUPATIONS.includes(occupation as (typeof REGISTRATION_OCCUPATIONS)[number])) {
+      return { error: 'Please select a valid occupation.' } satisfies AuthActionState;
+    }
+
+    if (!REGISTRATION_QUALIFICATION_LEVELS.includes(qualificationLevel as (typeof REGISTRATION_QUALIFICATION_LEVELS)[number])) {
+      return { error: 'Please select a valid qualification level.' } satisfies AuthActionState;
+    }
+
+    if (!REGISTRATION_GENDER_OPTIONS.includes(gender as (typeof REGISTRATION_GENDER_OPTIONS)[number])) {
+      return { error: 'Please select a valid gender option.' } satisfies AuthActionState;
+    }
+
+    if (!REGISTRATION_AGE_BRACKETS.includes(ageBracket as (typeof REGISTRATION_AGE_BRACKETS)[number])) {
+      return { error: 'Please select a valid age bracket.' } satisfies AuthActionState;
+    }
+
+    if (!STAR_PARTICIPATION_STATUSES.includes(starParticipationStatus as (typeof STAR_PARTICIPATION_STATUSES)[number])) {
+      return { error: 'Please select a valid STAR participation status.' } satisfies AuthActionState;
+    }
   }
 
   if (!consentDataProcessing) {
@@ -318,35 +365,6 @@ export async function updateProfileAction(_state: AuthActionState, formData: For
     return { error: 'Full name contains invalid characters or is too short.' } satisfies AuthActionState;
   }
 
-  if (!PHILIPPINE_REGIONS_SHORT.includes(region)) {
-    return { error: 'Please select a valid Philippine region.' } satisfies AuthActionState;
-  }
-
-  const divisionsForRegion = REGION_DIVISIONS_BY_REGION[region] ?? [];
-  if (divisionsForRegion.length > 0 && !divisionsForRegion.includes(division)) {
-    return { error: 'Please select a valid division for the selected region.' } satisfies AuthActionState;
-  }
-
-  if (!REGISTRATION_OCCUPATIONS.includes(occupation as (typeof REGISTRATION_OCCUPATIONS)[number])) {
-    return { error: 'Please select a valid occupation.' } satisfies AuthActionState;
-  }
-
-  if (!REGISTRATION_QUALIFICATION_LEVELS.includes(qualificationLevel as (typeof REGISTRATION_QUALIFICATION_LEVELS)[number])) {
-    return { error: 'Please select a valid qualification level.' } satisfies AuthActionState;
-  }
-
-  if (!REGISTRATION_GENDER_OPTIONS.includes(gender as (typeof REGISTRATION_GENDER_OPTIONS)[number])) {
-    return { error: 'Please select a valid gender option.' } satisfies AuthActionState;
-  }
-
-  if (!REGISTRATION_AGE_BRACKETS.includes(ageBracket as (typeof REGISTRATION_AGE_BRACKETS)[number])) {
-    return { error: 'Please select a valid age bracket.' } satisfies AuthActionState;
-  }
-
-  if (!STAR_PARTICIPATION_STATUSES.includes(starParticipationStatus as (typeof STAR_PARTICIPATION_STATUSES)[number])) {
-    return { error: 'Please select a valid STAR participation status.' } satisfies AuthActionState;
-  }
-
   const yearsOfExperience = Number.parseInt(yearsRaw, 10);
 
   if (Number.isNaN(yearsOfExperience) || yearsOfExperience < 0 || yearsOfExperience > 60) {
@@ -354,10 +372,6 @@ export async function updateProfileAction(_state: AuthActionState, formData: For
   }
 
   const subjectsTaught = normalizeCsvList(subjectsRaw, 12);
-  if (subjectsTaught.length === 0) {
-    return { error: 'Please provide at least one subject specialization.' } satisfies AuthActionState;
-  }
-
   const trainingHistory = normalizeLineList(trainingHistoryRaw, 12);
 
   const dataQualityScore = computeProfileDataQualityScore({

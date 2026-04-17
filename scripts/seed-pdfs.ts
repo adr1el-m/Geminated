@@ -29,6 +29,9 @@ if (!connectionString) {
 }
 
 const pool = new Pool({ connectionString });
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_EMBEDDING_MODEL = process.env.GROQ_EMBEDDING_MODEL || 'nomic-embed-text-v1.5';
+const GROQ_EMBEDDINGS_API_URL = 'https://api.groq.com/openai/v1/embeddings';
 
 function buildDeterministicEmbedding(text: string, dimensions = 768): number[] {
   const vector = new Array(dimensions).fill(0);
@@ -42,6 +45,57 @@ function buildDeterministicEmbedding(text: string, dimensions = 768): number[] {
 
   const norm = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0)) || 1;
   return vector.map((value) => Number((value / norm).toFixed(6)));
+}
+
+function normalizeTextForEmbedding(text: string) {
+  return text.replace(/\s+/g, ' ').trim().slice(0, 8000);
+}
+
+async function buildSemanticEmbedding(text: string): Promise<number[]> {
+  const normalized = normalizeTextForEmbedding(text);
+  if (!normalized) {
+    return [];
+  }
+
+  if (!GROQ_API_KEY || GROQ_API_KEY.includes('your_groq_api_key_here')) {
+    return buildDeterministicEmbedding(normalized);
+  }
+
+  try {
+    const response = await fetch(GROQ_EMBEDDINGS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: GROQ_EMBEDDING_MODEL,
+        input: normalized,
+        encoding_format: 'float',
+      }),
+    });
+
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      const message = payload?.error?.message || `Groq embeddings request failed (${response.status})`;
+      throw new Error(message);
+    }
+
+    const rawVector = payload?.data?.[0]?.embedding;
+    if (!Array.isArray(rawVector) || rawVector.length === 0) {
+      throw new Error('Groq returned an empty embedding vector.');
+    }
+
+    const vector = rawVector.map((value) => Number(value)).filter((value) => Number.isFinite(value));
+    if (vector.length === 0) {
+      throw new Error('Groq returned a malformed embedding vector.');
+    }
+
+    return vector;
+  } catch (error) {
+    console.warn('Semantic embedding failed, using deterministic fallback:', error instanceof Error ? error.message : error);
+    return buildDeterministicEmbedding(normalized);
+  }
 }
 
 // 2. Mock Data Pools
@@ -110,7 +164,7 @@ async function run() {
 
     // Generate deterministic local embedding
     const textForEmbedding = `${title}\n\n${description}\n\n${keywordsStr}`;
-    const embeddingValues = buildDeterministicEmbedding(textForEmbedding);
+    const embeddingValues = await buildSemanticEmbedding(textForEmbedding);
 
     const embeddingStr = `[${embeddingValues.join(',')}]`;
     const fileName = `${title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
