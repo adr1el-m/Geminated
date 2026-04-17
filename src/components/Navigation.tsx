@@ -47,14 +47,17 @@ export default function Navigation({ currentUser }: NavigationProps) {
           <Link href="/repository" className={layoutStyles.navLink} onClick={closeMenu}>Research & Projects</Link>
           <Link href="/forum" className={layoutStyles.navLink} onClick={closeMenu}>Community Forums</Link>
           <Link href="/map" className={layoutStyles.navLink} onClick={closeMenu}>Regional Map</Link>
+          
           {currentUser ? (
             <>
-              <Link href="/dashboard" className={layoutStyles.navLink} onClick={closeMenu}>Dashboard</Link>
+              {currentUser.role === 'teacher' ? (
+                <Link href="/dashboard" className={layoutStyles.navLink} onClick={closeMenu}>Dashboard</Link>
+              ) : null}
               <Link href="/programs" className={layoutStyles.navLink} onClick={closeMenu}>Programs</Link>
+              {currentUser.role === 'admin' ? (
+                <Link href="/admin" className={layoutStyles.navLink} onClick={closeMenu}>Admin Dashboard</Link>
+              ) : null}
             </>
-          ) : null}
-          {currentUser?.role === 'admin' ? (
-            <Link href="/admin" className={layoutStyles.navLink} onClick={closeMenu}>Admin Dashboard</Link>
           ) : null}
           <a href="https://e-star.ph" target="_blank" rel="noopener noreferrer" className={`${layoutStyles.navLink} ${layoutStyles.externalLink}`} onClick={closeMenu}>
             Back to e-STAR.ph ↗

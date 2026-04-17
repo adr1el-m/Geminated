@@ -16,15 +16,6 @@ type GroqChatPayload = {
   };
 };
 
-type GroqEmbeddingPayload = {
-  data?: Array<{
-    embedding?: number[];
-  }>;
-  error?: {
-    message?: string;
-  };
-};
-
 type RepositoryContextDocument = {
   title?: string;
   author_name?: string;
@@ -67,7 +58,6 @@ function getRetryAfterMs(error: unknown): number | undefined {
 }
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_EMBEDDINGS_API_URL = "https://api.groq.com/openai/v1/embeddings";
 
 const DEFAULT_GROQ_MODELS = [
   process.env.GROQ_MODEL,
@@ -76,17 +66,8 @@ const DEFAULT_GROQ_MODELS = [
   "llama-3.3-70b-versatile",
 ].filter((model): model is string => Boolean(model && model.trim()));
 
-const DEFAULT_GROQ_EMBEDDING_MODELS = [
-  process.env.GROQ_EMBEDDING_MODEL,
-  "nomic-embed-text-v1.5",
-  "text-embedding-3-small",
-].filter((model): model is string => Boolean(model && model.trim()));
-
 const QUOTA_COOLDOWN_DEFAULT_MS = 60_000;
-const EMBEDDING_QUOTA_COOLDOWN_DEFAULT_MS = 60_000;
 let quotaBlockedUntilMs = 0;
-let embeddingQuotaBlockedUntilMs = 0;
-let loggedEmbeddingFailure = false;
 
 function parseRetryAfterHeaderMs(retryAfter: string | null): number | null {
   if (!retryAfter) return null;
@@ -141,16 +122,6 @@ function getQuotaWaitSeconds() {
   return Math.max(0, Math.ceil((quotaBlockedUntilMs - Date.now()) / 1000));
 }
 
-function updateEmbeddingQuotaCooldown(error: unknown) {
-  const retryMs = parseRetryDelayMs(error) ?? EMBEDDING_QUOTA_COOLDOWN_DEFAULT_MS;
-  embeddingQuotaBlockedUntilMs = Math.max(embeddingQuotaBlockedUntilMs, Date.now() + retryMs);
-  return retryMs;
-}
-
-function getEmbeddingQuotaWaitSeconds() {
-  return Math.max(0, Math.ceil((embeddingQuotaBlockedUntilMs - Date.now()) / 1000));
-}
-
 function buildApiError(status: number, message: string, retryAfterMs?: number) {
   const error = new Error(message) as GroqApiError;
   error.status = status;
@@ -199,63 +170,6 @@ async function generateContentFromGroq(prompt: string, model: string): Promise<{
   }
 
   return { text };
-}
-
-function normalizeEmbeddingInput(text: string) {
-  return text.replace(/\s+/g, " ").trim().slice(0, 8_000);
-}
-
-async function generateEmbeddingFromGroq(text: string, model: string): Promise<number[]> {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey || apiKey.includes("your_groq_api_key_here")) {
-    throw buildApiError(401, "GROQ_API_KEY is missing or still set to a placeholder value.");
-  }
-
-  const normalized = normalizeEmbeddingInput(text);
-  if (!normalized) {
-    return [];
-  }
-
-  const response = await fetch(GROQ_EMBEDDINGS_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      input: normalized,
-      encoding_format: "float",
-    }),
-  });
-
-  const retryAfterMs = parseRetryAfterHeaderMs(response.headers.get("retry-after"));
-  let payload: GroqEmbeddingPayload | null = null;
-  try {
-    payload = (await response.json()) as GroqEmbeddingPayload;
-  } catch {
-    payload = null;
-  }
-
-  if (!response.ok) {
-    const apiMessage = String(payload?.error?.message || `Groq embeddings request failed with status ${response.status}.`);
-    throw buildApiError(response.status, apiMessage, retryAfterMs ?? undefined);
-  }
-
-  const rawVector = payload?.data?.[0]?.embedding;
-  if (!Array.isArray(rawVector) || rawVector.length === 0) {
-    throw buildApiError(502, `Groq returned an empty embedding for model ${model}.`);
-  }
-
-  const vector = rawVector
-    .map((value) => Number(value))
-    .filter((value) => Number.isFinite(value));
-
-  if (vector.length === 0) {
-    throw buildApiError(502, `Groq returned a malformed embedding for model ${model}.`);
-  }
-
-  return vector;
 }
 
 function truncateText(text: string, maxLength = 180) {
@@ -414,6 +328,7 @@ async function generateContentWithFallback(prompt: string) {
 }
 
 export async function generateTextEmbedding(text: string): Promise<number[]> {
+  void text;
   // Groq has deprecated its `/openai/v1/embeddings` endpoint and models.
   // Returning an empty array immediately to trigger the robust native full-text fallback
   // without causing console errors or model unavailable spam.
