@@ -91,6 +91,42 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0pt}
 
+\tikzset{
+  mindroot/.style={
+    draw=themeColor,
+    fill=themeColor!10,
+    rounded corners=5pt,
+    thick,
+    text width=2.1cm,
+    align=center,
+    font=\scriptsize\bfseries,
+    inner sep=5pt
+  },
+  mindleaf/.style={
+    draw=SoftBlue!60,
+    fill=LightBlueBg,
+    rounded corners=4pt,
+    text width=2.55cm,
+    align=left,
+    font=\scriptsize,
+    inner sep=4pt
+  },
+  mindaccent/.style={
+    draw=themeColor!45,
+    fill=LightRedBg,
+    rounded corners=4pt,
+    text width=2.55cm,
+    align=left,
+    font=\scriptsize,
+    inner sep=4pt
+  },
+  mindline/.style={
+    draw=themeColor!55,
+    -{Latex[length=1.8mm]},
+    line width=0.45pt
+  }
+}
+
 
 
 % ============================================================
@@ -170,7 +206,7 @@
     before skip=4pt,
     after skip=5pt
   ]
-  {\bfseries\color{themeColor}Mindmap in words}\par\vspace{3pt}
+  {\bfseries\color{themeColor}LaTeX mind map}\par\vspace{3pt}
   {\small\RaggedRight #1}
   \end{tcolorbox}
   \begin{tcolorbox}[
@@ -216,7 +252,7 @@
 % ============================================================
 
 \memorybox{Exam-scope order}{
-This reviewer is now grouped by the six exam scopes: \textbf{Network Layer}, \textbf{IPv4 Concepts}, \textbf{IPv6 Concepts}, \textbf{Transport Layer}, \textbf{Application Layer}, and \textbf{Network Security Fundamentals}. Each scope starts with a text-based mindmap and a quick visual before the questions.
+This reviewer is now grouped by the six exam scopes: \textbf{Network Layer}, \textbf{IPv4 Concepts}, \textbf{IPv6 Concepts}, \textbf{Transport Layer}, \textbf{Application Layer}, and \textbf{Network Security Fundamentals}. Each scope starts with a LaTeX-drawn mind map and a quick visual before the questions.
 }
 
 % ============================================================
@@ -264,13 +300,17 @@ This reviewer is now grouped by the six exam scopes: \textbf{Network Layer}, \te
 \clearpage
 \section{Network Layer}
 \scopepage{
-\begin{itemize}[leftmargin=1em]
-  \item \textbf{Basic operations}: address end devices, encapsulate packets, route them, then de-encapsulate.
-  \item \textbf{IP characteristics}: connectionless, best effort/unreliable, media independent.
-  \item \textbf{Packets}: IPv4 has limitations and fragmentation; IPv6 improves address space and moves optional work to extension headers.
-  \item \textbf{Host routing}: self-route for local host, send same-LAN traffic locally, send remote traffic to the default gateway.
-  \item \textbf{Routing tables}: match known routes, discard no-match traffic, or use a default/last-resort route.
-\end{itemize}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[mindroot] (root) at (0,0) {Network\\Layer};
+  \node[mindleaf] (ops) at (-4.1,1.55) {\textbf{Basic operations}\\address end devices\\encapsulate packets\\route and de-encapsulate};
+  \node[mindaccent] (ip) at (-4.1,-1.55) {\textbf{IP traits}\\connectionless\\best effort\\media independent};
+  \node[mindleaf] (packet) at (4.1,1.7) {\textbf{Packets}\\IPv4 header limits\\MTU and fragmentation\\IPv6 extension headers};
+  \node[mindaccent] (host) at (4.1,0) {\textbf{Host routing}\\self route\\same LAN direct\\remote via gateway};
+  \node[mindleaf] (table) at (4.1,-1.7) {\textbf{Routing table}\\route source\\best match\\default route};
+  \foreach \target in {ops,ip,packet,host,table}{\draw[mindline] (root) -- (\target);}
+\end{tikzpicture}
+\end{center}
 }{
 \begin{center}
 \begin{tikzpicture}[>=Latex, node distance=0.95cm, every node/.style={font=\scriptsize, align=center}]
@@ -373,14 +413,18 @@ This reviewer is now grouped by the six exam scopes: \textbf{Network Layer}, \te
 \clearpage
 \section{IPv4 Concepts}
 \scopepage{
-\begin{itemize}[leftmargin=1em]
-  \item \textbf{Address structure}: 32-bit hierarchical address split into network and host portions.
-  \item \textbf{Subnet mask}: marks network bits; prefix length counts the 1 bits and is written as slash notation.
-  \item \textbf{Address types}: network address, first usable, last usable, broadcast address.
-  \item \textbf{Communication}: unicast is one-to-one, broadcast is one-to-all, multicast is one-to-group.
-  \item \textbf{Special ranges}: RFC 1918 private, loopback 127.0.0.0/8, APIPA/link-local 169.254.0.0/16, NAT private-to-public.
-  \item \textbf{Subnetting}: borrow host bits, use VLSM to reduce wasted addresses, and match subnet size to host need.
-\end{itemize}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[mindroot] (root) at (0,0) {IPv4\\Concepts};
+  \node[mindleaf] (structure) at (-4.1,1.75) {\textbf{Structure}\\32 bits\\four octets\\network plus host};
+  \node[mindaccent] (mask) at (-4.1,0) {\textbf{Masking}\\subnet mask\\prefix length\\ANDing};
+  \node[mindleaf] (types) at (-4.1,-1.75) {\textbf{Address types}\\network address\\usable hosts\\broadcast address};
+  \node[mindaccent] (comm) at (4.1,1.75) {\textbf{Delivery}\\unicast one-to-one\\broadcast one-to-all\\multicast one-to-group};
+  \node[mindleaf] (special) at (4.1,0) {\textbf{Special ranges}\\private RFC1918\\loopback 127/8\\APIPA 169.254/16};
+  \node[mindaccent] (subnet) at (4.1,-1.75) {\textbf{Subnetting}\\borrow host bits\\VLSM\\match host need};
+  \foreach \target in {structure,mask,types,comm,special,subnet}{\draw[mindline] (root) -- (\target);}
+\end{tikzpicture}
+\end{center}
 }{
 \begin{tabularx}{\linewidth}{@{}>{\bfseries}l X@{}}
 Example & \texttt{192.168.10.15/24} \\
@@ -567,14 +611,18 @@ Broadcast & \texttt{192.168.10.255} \\
 \clearpage
 \section{IPv6 Concepts}
 \scopepage{
-\begin{itemize}[leftmargin=1em]
-  \item \textbf{Why IPv6}: IPv4 exhaustion, 128-bit address space, dual stack, tunneling, and NAT64 translation.
-  \item \textbf{Writing addresses}: hexadecimal hextets, omit leading zeros, use one double-colon for one all-zero run.
-  \item \textbf{Address types}: unicast, multicast, anycast; no broadcast in IPv6.
-  \item \textbf{GUA structure}: global routing prefix, subnet ID, interface ID.
-  \item \textbf{LLA}: required on interfaces, non-routable beyond the local link, fe80::/10.
-  \item \textbf{Dynamic addressing}: RS/RA messages, SLAAC, stateless DHCPv6, stateful DHCPv6.
-\end{itemize}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[mindroot] (root) at (0,0) {IPv6\\Concepts};
+  \node[mindleaf] (why) at (-4.1,1.75) {\textbf{Why IPv6}\\IPv4 exhaustion\\128-bit space\\dual stack, tunneling, translation};
+  \node[mindaccent] (write) at (-4.1,0) {\textbf{Writing}\\hex hextets\\omit leading zeros\\one double-colon run};
+  \node[mindleaf] (types) at (-4.1,-1.75) {\textbf{Address types}\\unicast\\multicast\\anycast\\no broadcast};
+  \node[mindaccent] (gua) at (4.1,1.75) {\textbf{GUA}\\global routing prefix\\subnet ID\\interface ID};
+  \node[mindleaf] (lla) at (4.1,0) {\textbf{LLA}\\required per interface\\fe80::/10\\local link only};
+  \node[mindaccent] (dynamic) at (4.1,-1.75) {\textbf{Dynamic addressing}\\RS and RA\\SLAAC\\stateless or stateful DHCPv6};
+  \foreach \target in {why,write,types,gua,lla,dynamic}{\draw[mindline] (root) -- (\target);}
+\end{tikzpicture}
+\end{center}
 }{
 \begin{tabularx}{\linewidth}{@{}>{\bfseries}l X@{}}
 \texttt{ff02::1} & All-nodes multicast group: all IPv6 interfaces on the local link listen. \\
@@ -864,13 +912,17 @@ Broadcast & \texttt{192.168.10.255} \\
 \clearpage
 \section{Transport Layer}
 \scopepage{
-\begin{itemize}[leftmargin=1em]
-  \item \textbf{Role}: logical communication between apps, segmentation/reassembly, multiplexing conversations.
-  \item \textbf{TCP}: connection-oriented, reliable, same-order delivery, stateful, flow control.
-  \item \textbf{UDP}: connectionless, best effort, low overhead, no session setup.
-  \item \textbf{Ports}: sockets combine IP address + port; port ranges are well-known, registered, and dynamic/private.
-  \item \textbf{TCP process}: three-way handshake, sequence/ACK numbers, window size, MSS, FIN/ACK termination.
-\end{itemize}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[mindroot] (root) at (0,0) {Transport\\Layer};
+  \node[mindleaf] (role) at (-4.1,1.55) {\textbf{Role}\\app-to-app delivery\\segmentation\\multiplexing};
+  \node[mindaccent] (tcp) at (-4.1,-1.55) {\textbf{TCP}\\connection-oriented\\reliable and ordered\\flow control};
+  \node[mindleaf] (udp) at (4.1,1.55) {\textbf{UDP}\\connectionless\\best effort\\low overhead};
+  \node[mindaccent] (ports) at (4.1,0) {\textbf{Ports}\\socket = IP + port\\well-known\\registered\\dynamic};
+  \node[mindleaf] (process) at (4.1,-1.55) {\textbf{TCP process}\\SYN, SYN-ACK, ACK\\sequence and ACK\\FIN termination};
+  \foreach \target in {role,tcp,udp,ports,process}{\draw[mindline] (root) -- (\target);}
+\end{tikzpicture}
+\end{center}
 }{
 \begin{center}
 \begin{tikzpicture}[>=Latex, node distance=0.8cm, every node/.style={font=\scriptsize, align=center}]
@@ -1291,14 +1343,18 @@ Ports & 0--1023 well-known; 1024--49151 registered; 49152--65535 dynamic \\
 \clearpage
 \section{Application Layer}
 \scopepage{
-\begin{itemize}[leftmargin=1em]
-  \item \textbf{Layer functions}: application = closest to user; presentation = format/compress/encrypt; session = dialog management.
-  \item \textbf{Network models}: client-server requests and responses; P2P peers can act as client and server.
-  \item \textbf{Web}: HTTP request/response, HTTPS secure/encrypted, GET/POST/PUT methods, URL structure.
-  \item \textbf{Email}: SMTP sends, POP retrieves/removes, IMAP synchronizes messages on the server.
-  \item \textbf{Addressing services}: DNS name-to-IP records and DHCP lease-based addressing.
-  \item \textbf{File sharing}: FTP uses control/data connections; SMB supports Windows file and print sharing.
-\end{itemize}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[mindroot] (root) at (0,0) {Application\\Layer};
+  \node[mindleaf] (layers) at (-4.1,1.75) {\textbf{Upper-layer roles}\\application: user services\\presentation: format, compress, encrypt\\session: dialogs};
+  \node[mindaccent] (models) at (-4.1,0) {\textbf{Models}\\client-server\\peer-to-peer\\hybrid P2P};
+  \node[mindleaf] (web) at (-4.1,-1.75) {\textbf{Web}\\HTTP and HTTPS\\GET, POST, PUT\\URL parts};
+  \node[mindaccent] (email) at (4.1,1.75) {\textbf{Email}\\SMTP sends\\POP retrieves\\IMAP syncs};
+  \node[mindleaf] (services) at (4.1,0) {\textbf{Services}\\DNS records\\DHCP DORA\\nslookup};
+  \node[mindaccent] (file) at (4.1,-1.75) {\textbf{File sharing}\\FTP control and data\\TFTP UDP 69\\SMB file and print};
+  \foreach \target in {layers,models,web,email,services,file}{\draw[mindline] (root) -- (\target);}
+\end{tikzpicture}
+\end{center}
 }{
 \begin{center}
 \begin{tikzpicture}[>=Latex, node distance=.85cm, every node/.style={font=\scriptsize, align=center}]
@@ -1567,14 +1623,18 @@ FTP & pull = download; control port 21, data port 20 \\
 \clearpage
 \section{Network Security Fundamentals}
 \scopepage{
-\begin{itemize}[leftmargin=1em]
-  \item \textbf{Threats}: information theft, data loss/manipulation, identity theft, service disruption.
-  \item \textbf{Vulnerabilities}: technological, configuration, security policy, and physical weaknesses.
-  \item \textbf{Malware}: viruses attach to hosts, worms stand alone, trojans pretend to be legitimate.
-  \item \textbf{Attacks}: reconnaissance, access attacks, DoS/DDoS, man-in-the-middle, trust exploitation, port redirection.
-  \item \textbf{Mitigation}: defense-in-depth, AAA, DMZ, firewalls, endpoint security, updates, backups.
-  \item \textbf{Hardening}: password rules, service password encryption, login block-for, SSH with RSA keys, disable unused services.
-\end{itemize}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[mindroot] (root) at (0,0) {Network\\Security};
+  \node[mindleaf] (threats) at (-4.1,1.75) {\textbf{Threats}\\information theft\\data loss\\identity theft\\service disruption};
+  \node[mindaccent] (vulns) at (-4.1,0) {\textbf{Vulnerabilities}\\technology\\configuration\\policy\\physical};
+  \node[mindleaf] (malware) at (-4.1,-1.75) {\textbf{Malware}\\virus: host file\\worm: standalone\\trojan: looks legitimate};
+  \node[mindaccent] (attacks) at (4.1,1.75) {\textbf{Attacks}\\reconnaissance\\access\\DoS and DDoS\\MitM};
+  \node[mindleaf] (mitigation) at (4.1,0) {\textbf{Mitigation}\\defense-in-depth\\AAA\\DMZ\\firewalls};
+  \node[mindaccent] (hardening) at (4.1,-1.75) {\textbf{Hardening}\\strong passwords\\SSH and RSA\\login block-for\\disable unused services};
+  \foreach \target in {threats,vulns,malware,attacks,mitigation,hardening}{\draw[mindline] (root) -- (\target);}
+\end{tikzpicture}
+\end{center}
 }{
 \begin{tabularx}{\linewidth}{@{}>{\bfseries}l X@{}}
 Authentication & Who are you? \\
