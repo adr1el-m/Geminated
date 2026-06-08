@@ -11,8 +11,9 @@ cd "$SCRIPT_DIR"
 TEX_FILE="dcn_reviewer.tex"
 PDF_FILE="dcn_reviewer.pdf"
 BUILD_DIR="build"
-PAPERS_SITE="../papers-site"
+PAPERS_SITE="../../papers-site"
 PUBLISHER="$PAPERS_SITE/publish.js"
+QUIZ_GENERATOR="$PAPERS_SITE/generate-quiz.js"
 SLUG="dcn-finals-reviewer"
 
 # ── Flags ──────────────────────────────────────────────────
@@ -49,7 +50,7 @@ done
 echo "▸ Building $TEX_FILE …"
 mkdir -p "$BUILD_DIR"
 
-latexmk -pdf -interaction=nonstopmode -halt-on-error \
+latexmk -xelatex -interaction=nonstopmode -halt-on-error \
   -output-directory="$BUILD_DIR" "$TEX_FILE"
 
 # Copy final PDF to project root
@@ -59,6 +60,14 @@ echo "✔ PDF ready: $PDF_FILE"
 if $BUILD_ONLY; then
   echo "▸ --build-only: skipping publish."
   exit 0
+fi
+
+# ── Quiz data ───────────────────────────────────────────────
+if [ -f "$QUIZ_GENERATOR" ]; then
+  echo "▸ Generating quiz data for $SLUG …"
+  node "$QUIZ_GENERATOR" "$SCRIPT_DIR/$TEX_FILE" "$SLUG" "DCN Finals Reviewer Quiz"
+else
+  echo "[warn] Quiz generator not found: $QUIZ_GENERATOR"
 fi
 
 # ── Publish ────────────────────────────────────────────────
@@ -77,8 +86,8 @@ PUBLISH_ARGS=(
   --subtitle "Data Communication and Networking"
   --author "Adriel M. Magalona"
   --subject "Data Communication and Networking"
-  --tags "DCN,Reviewer,IPv6,Networking,Security"
-  --abstract "A comprehensive reviewer covering IPv6 transition and address types, IPv4 addressing, network security threats, malware types, physical and infrastructure threats, attack types, firewall filtering, and IPv6 multicast addressing for the DCN finals exam."
+  --tags "DCN,Reviewer,IPv6,Networking,Security,TCP,UDP"
+  --abstract "A comprehensive reviewer covering IPv6 transition and address types, IPv4 addressing, network security threats, malware types, physical and infrastructure threats, attack types, firewall filtering, IPv6 multicast addressing, and TCP/UDP transport-layer concepts for the DCN finals exam."
 )
 
 if $PUSH; then
