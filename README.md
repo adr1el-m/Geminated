@@ -11,6 +11,8 @@
   ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
   ![Vercel](https://img.shields.io/badge/Vercel-Deploy-000000?style=for-the-badge&logo=vercel&logoColor=white)
   ![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)
+
+  ![START-a-TON Champion](https://img.shields.io/badge/START--a--TON-CHAMPION-F5B700?style=for-the-badge)
 </div>
 
 **Live Demo:** [https://geminated-star-link.vercel.app/](https://geminated-star-link.vercel.app/)
@@ -20,20 +22,21 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Tech Stack](#tech-stack)
-3. [Interactive Intelligence Flow](#interactive-intelligence-flow)
-4. [Repository Structure](#repository-structure)
-5. [Core Features](#core-features)
-6. [Screenshots](#screenshots)
-7. [Getting Started](#getting-started)
-8. [Environment Variables](#environment-variables)
-9. [Available Scripts](#available-scripts)
-10. [UI/UX Design Direction](#uiux-design-direction)
-11. [Security Hardening](#security-hardening)
-12. [Production Readiness](#production-readiness)
-13. [Success Metrics](#success-metrics)
-14. [Delivery Phases](#delivery-phases)
-15. [Team](#team)
+2. [START-a-TON Champion](#start-a-ton-champion)
+3. [Tech Stack](#tech-stack)
+4. [Interactive Intelligence Flow](#interactive-intelligence-flow)
+5. [Repository Structure](#repository-structure)
+6. [Core Features](#core-features)
+7. [Screenshots](#screenshots)
+8. [Getting Started](#getting-started)
+9. [Environment Variables](#environment-variables)
+10. [Available Scripts](#available-scripts)
+11. [UI/UX Design Direction](#uiux-design-direction)
+12. [Security Hardening](#security-hardening)
+13. [Production Readiness](#production-readiness)
+14. [Success Metrics](#success-metrics)
+15. [Delivery Phases](#delivery-phases)
+16. [Team](#team)
 
 ---
 
@@ -54,21 +57,35 @@ The goal is to transform isolated innovations into nationally shared assets for 
 
 ---
 
+## START-a-TON Champion
+
+**STAR-LINK**, built by **Team Geminated**, was crowned **Champion** of the **START-a-TON: Data & AI Innovation Challenge**—a nationwide hackathon for DOST techno-scholars organized by [START-DOST](https://www.linkedin.com/company/startdost/) in collaboration with the **DOST-SEI Science Teacher Academy for the Regions (STAR)**.
+
+The winning platform adds a social and intelligence layer to the e-STAR.ph ecosystem, helping educators share action research, collaborate across regions, surface evidence-based pedagogical insights, and identify regional needs through AI-assisted analysis.
+
+<p align="center">
+  <img src="readme_images/grandwinnerannouncementpost.jpeg" width="95%" alt="Official START-a-TON announcement naming Team Geminated as Champion of the Data and AI Innovation Challenge">
+</p>
+
+<p align="center"><em>Official champion announcement by START-DOST. Image credit: START-DOST.</em></p>
+
+---
+
 ## Tech Stack
 
-### Core Framework
-
-<table width="100%" style="width: 100%; table-layout: fixed;">
+<table width="100%">
   <thead>
     <tr>
-      <th align="left" width="18%">Layer</th>
-      <th align="left" width="28%">Technology</th>
+      <th align="left" width="18%">Category</th>
+      <th align="left" width="17%">Layer</th>
+      <th align="left" width="21%">Technology</th>
       <th align="left" width="12%">Version</th>
-      <th align="left" width="42%">Purpose</th>
+      <th align="left" width="32%">Purpose</th>
     </tr>
   </thead>
   <tbody>
     <tr>
+      <td rowspan="4"><strong>Core Framework</strong></td>
       <td>Framework</td>
       <td><img src="https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white" alt="Next.js"></td>
       <td>16.2</td>
@@ -92,22 +109,8 @@ The goal is to transform isolated innovations into nationally shared assets for 
       <td>--</td>
       <td>Scoped component styles with shared design tokens</td>
     </tr>
-  </tbody>
-</table>
-
-### Data and Authentication
-
-<table width="100%" style="width: 100%; table-layout: fixed;">
-  <thead>
     <tr>
-      <th align="left" width="18%">Layer</th>
-      <th align="left" width="28%">Technology</th>
-      <th align="left" width="12%">Version</th>
-      <th align="left" width="42%">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
+      <td rowspan="6"><strong>Data &amp; Authentication</strong></td>
       <td>Database</td>
       <td><img src="https://img.shields.io/badge/Neon_Postgres-00E599?style=flat&logo=postgresql&logoColor=white" alt="Neon Postgres"></td>
       <td>--</td>
@@ -143,22 +146,8 @@ The goal is to transform isolated innovations into nationally shared assets for 
       <td>5.0-beta</td>
       <td>Available for OAuth/social login expansion</td>
     </tr>
-  </tbody>
-</table>
-
-### Maps, Visualization, and Reporting
-
-<table width="100%" style="width: 100%; table-layout: fixed;">
-  <thead>
     <tr>
-      <th align="left" width="18%">Layer</th>
-      <th align="left" width="28%">Technology</th>
-      <th align="left" width="12%">Version</th>
-      <th align="left" width="42%">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
+      <td rowspan="4"><strong>Maps, Visualization &amp; Reporting</strong></td>
       <td>Maps</td>
       <td><img src="https://img.shields.io/badge/Leaflet-199900?style=flat&logo=leaflet&logoColor=white" alt="Leaflet"></td>
       <td>1.9 / 5.0</td>
@@ -182,22 +171,8 @@ The goal is to transform isolated innovations into nationally shared assets for 
       <td>--</td>
       <td>Regional boundary rendering on the collaboration map</td>
     </tr>
-  </tbody>
-</table>
-
-### File Storage
-
-<table width="100%" style="width: 100%; table-layout: fixed;">
-  <thead>
     <tr>
-      <th align="left" width="18%">Layer</th>
-      <th align="left" width="28%">Technology</th>
-      <th align="left" width="12%">Version</th>
-      <th align="left" width="42%">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
+      <td rowspan="2"><strong>File Storage</strong></td>
       <td>Document Storage</td>
       <td><img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white" alt="PostgreSQL"></td>
       <td>--</td>
@@ -209,43 +184,15 @@ The goal is to transform isolated innovations into nationally shared assets for 
       <td>2.3</td>
       <td>Available for large file offloading</td>
     </tr>
-  </tbody>
-</table>
-
-### Tooling and Quality
-
-<table width="100%" style="width: 100%; table-layout: fixed;">
-  <thead>
     <tr>
-      <th align="left" width="18%">Layer</th>
-      <th align="left" width="28%">Technology</th>
-      <th align="left" width="12%">Version</th>
-      <th align="left" width="42%">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
+      <td><strong>Tooling &amp; Quality</strong></td>
       <td>CI Pipeline</td>
       <td>NPM</td>
       <td>--</td>
       <td>Lint, typecheck, and build in a single command</td>
     </tr>
-  </tbody>
-</table>
-
-### Knowledge Intelligence (AI Layer)
-
-<table width="100%" style="width: 100%; table-layout: fixed;">
-  <thead>
     <tr>
-      <th align="left" width="18%">Layer</th>
-      <th align="left" width="28%">Technology</th>
-      <th align="left" width="12%">Model</th>
-      <th align="left" width="42%">Purpose</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
+      <td rowspan="4"><strong>Knowledge Intelligence</strong></td>
       <td>Inference Engine</td>
       <td><img src="https://img.shields.io/badge/Groq-f55036?style=flat" alt="Groq"></td>
       <td>Llama-3.1 / 3.3</td>
@@ -271,7 +218,6 @@ The goal is to transform isolated innovations into nationally shared assets for 
     </tr>
   </tbody>
 </table>
-
 
 ---
 
