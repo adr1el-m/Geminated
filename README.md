@@ -13,6 +13,7 @@
   ![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)
 
   ![START-a-TON Champion](https://img.shields.io/badge/START--a--TON-CHAMPION-F5B700?style=for-the-badge)
+  ![ESKWELABS Future of Work Catalyst Award](https://img.shields.io/badge/ESKWELABS-FUTURE%20OF%20WORK%20CATALYST-10B981?style=for-the-badge)
 </div>
 
 **Live Demo:** [https://geminated-star-link.vercel.app/](https://geminated-star-link.vercel.app/)
@@ -68,6 +69,16 @@ The winning platform adds a social and intelligence layer to the e-STAR.ph ecosy
 </p>
 
 <p align="center"><em>Official champion announcement by START-DOST. Image credit: START-DOST.</em></p>
+
+### ESKWELABS Future of Work Catalyst Award
+
+Team Geminated also received the **ESKWELABS Future of Work Catalyst Award**, recognizing STAR-LINK's potential to strengthen how educators collaborate, share knowledge, and turn regional insights into nationwide action.
+
+<p align="center">
+  <img src="readme_images/ESKWELABS%20Future%20of%20Work%20Catalyst%20Award.jpeg" width="58%" alt="Official START-a-TON special award announcement naming Team Geminated as the ESKWELABS Future of Work Catalyst Award recipient">
+</p>
+
+<p align="center"><em>Official special-award announcement by START-DOST and ESKWELABS. Image credit: START-DOST.</em></p>
 
 ---
 
